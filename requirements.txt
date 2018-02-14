@@ -1,0 +1,12 @@
+sanic==0.7.0
+sanic-script==0.3
+
+aioredis==1.0.0
+mongomotor==0.11.0
+
+marshmallow==3.0.0b7
+marshmallow-mongoengine==0.9.1
+
+pytest==3.4.0
+pytest-cov==2.5.1
+pytest-sanic==0.1.8
