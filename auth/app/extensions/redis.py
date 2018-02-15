@@ -35,6 +35,6 @@ class RedisExtension(BaseExtension):
         async def aioredis_free_resources(app_inner, _loop):
             aioredis_pool = getattr(app_inner, self.app_attribute, None)
 
-            if aioredis_pool and not aioredis_pool.closed:
+            if aioredis_pool:
                 aioredis_pool.close()
                 await aioredis_pool.wait_closed()
