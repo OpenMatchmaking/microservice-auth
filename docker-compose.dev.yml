@@ -17,6 +17,7 @@ services:
       - "8000:8000"
     depends_on:
       - mongodb
+      - redis
     networks:
       - app-tier
     tty: true
@@ -44,5 +45,27 @@ services:
       - DB_HOST=mongodb
     depends_on:
       - mongodb
+    networks:
+      - app-tier
+
+  redis:
+    image: bitnami/redis:latest
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_EXTRA_FLAGS=--maxmemory 100mb
+    networks:
+      - app-tier
+
+  redis_ui:
+    image: tenstartups/redis-commander:latest
+    command: --redis-host redis
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    links:
+      - redis:redis
     networks:
       - app-tier
