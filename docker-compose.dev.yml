@@ -12,9 +12,13 @@ services:
       dockerfile: ./Dockerfile
     image: microservice-auth
     environment:
+      - APP_HOST=0.0.0.0
       - APP_CONFIG_PATH=./config.py
       - REDIS_HOST=redis
-      - APP_HOST=0.0.0.0
+      - MONGODB_USERNAME=user
+      - MONGODB_PASSWORD=password
+      - MONGODB_HOST=mongodb
+      - MONGODB_DATABASE=auth
     volumes:
       - ./auth:/app/
     ports:
