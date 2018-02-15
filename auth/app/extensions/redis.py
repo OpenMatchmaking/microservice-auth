@@ -1,25 +1,25 @@
 from sanic import Sanic
 from aioredis import create_redis_pool
 
-from app.extensions import BaseExtension
+from app.extensions.base import BaseExtension
 
 
 class RedisExtension(BaseExtension):
     app_attribute = 'redis'
 
     def get_config(self, app):
-        connection_uri = "redis://{}:{}".format(
+        connection_uri = (
             self.get_from_app_config(app, 'REDIS_HOST'),
             self.get_from_app_config(app, 'REDIS_PORT'),
         )
         config = {
             "address": connection_uri,
-            "db": self.get_from_app_config('REDIS_DATABASE', None),
-            "password": self.get_from_app_config('REDIS_PASSWORD', None),
-            "ssl": self.get_from_app_config('REDIS_SSL', None),
-            "encoding": self.get_from_app_config('REDIS_ENCODING', None),
-            "minsize": self.get_from_app_config('REDIS_MIN_SIZE_POOL', 1),
-            "maxsize": self.get_from_app_config('REDIS_MAX_SIZE_POOL', 10),
+            "db": self.get_from_app_config(app, 'REDIS_DATABASE', None),
+            "password": self.get_from_app_config(app, 'REDIS_PASSWORD', None),
+            "ssl": self.get_from_app_config(app, 'REDIS_SSL', None),
+            "encoding": self.get_from_app_config(app, 'REDIS_ENCODING', None),
+            "minsize": self.get_from_app_config(app, 'REDIS_MIN_SIZE_POOL', 1),
+            "maxsize": self.get_from_app_config(app, 'REDIS_MAX_SIZE_POOL', 10),
         }
         return config
 
@@ -35,6 +35,6 @@ class RedisExtension(BaseExtension):
         async def aioredis_free_resources(app_inner, _loop):
             aioredis_pool = getattr(app_inner, self.app_attribute, None)
 
-            if aioredis_pool and not aioredis_pool.closed():
+            if aioredis_pool and not aioredis_pool.closed:
                 aioredis_pool.close()
                 await aioredis_pool.wait_closed()
