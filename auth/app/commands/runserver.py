@@ -10,8 +10,8 @@ class RunServerCommand(Command):
     app = app
 
     option_list = (
-        Option('--host', '-h', dest='host', default='127.0.0.1'),
-        Option('--port', '-p', dest='port', default=8000),
+        Option('--host', '-h', dest='host'),
+        Option('--port', '-p', dest='port'),
     )
 
     def run(self, *args, **kwargs):
