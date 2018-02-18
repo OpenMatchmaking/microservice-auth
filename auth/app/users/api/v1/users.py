@@ -2,6 +2,7 @@ from sanic.response import json
 from marshmallow import ValidationError
 
 from app.generic.views import APIView
+from app.generic.utils import wrap_error
 
 
 class RegisterGameClientView(APIView):
@@ -30,7 +31,7 @@ class RegisterGameClientView(APIView):
             data = self.deserialize(request.json)
             await self.validate_username_for_uniqueness(data["username"])
         except ValidationError as exc:
-            return json(exc.normalized_messages(), status=400)
+            return json(wrap_error(exc.normalized_messages()), status=400)
 
         data['groups'] = await self.group_document\
             .find({"name": self.default_group_name})\

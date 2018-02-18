@@ -20,8 +20,7 @@ APP_DEBUG = to_bool(os.environ.get('APP_DEBUG', False))
 APP_SSL = None
 APP_WORKERS = int((os.environ.get('APP_WORKERS', 1)))
 
-SECRET_KEY = os.environ.get('APP_SECRET_KEY', 'some-secret-key')
-
+# Redis settings
 REDIS_HOST = os.environ.get('REDIS_HOST', "127.0.0.1")
 REDIS_PORT = to_int(os.environ.get('REDIS_PORT', "6379"))
 REDIS_DATABASE = None
@@ -30,6 +29,7 @@ REDIS_ENCODING = os.environ.get('REDIS_SSL', None)
 REDIS_MIN_SIZE_POOL = to_int(os.environ.get('REDIS_MIN_SIZE_POOL', 1))
 REDIS_MAX_SIZE_POOL = to_int(os.environ.get('REDIS_MAX_SIZE_POOL', 10))
 
+# MongoDB settings
 MONGODB_USERNAME = os.environ.get("MONGODB_USERNAME", "user")
 MONGODB_PASSWORD = os.environ.get("MONGODB_PASSWORD", "password")
 MONGODB_HOST = os.environ.get("MONGODB_HOST", "mongodb")
@@ -43,3 +43,12 @@ MONGODB_URI = 'mongodb://{}:{}@{}:{}/{}'.format(
     MONGODB_DATABASE
 )
 LAZY_UMONGO = MotorAsyncIOInstance()
+
+# Settings for setting up JWT
+JWT_ALGORITHM = 'HS256'
+JWT_LIFETIME = 60 * 30
+JWT_SECRET_KEY = os.environ.get('APP_JWT_SECRET_KEY', 'some-secret-key')
+JWT_AUTHORIZATION_HEADER_NAME = 'authorization'
+JWT_AUTHORIZATION_HEADER_PREFIX = 'JWT'
+JWT_ACCESS_TOKEN_FIELD_NAME = 'access_token'
+JWT_REFRESH_TOKEN_FIELD_NAME = 'refresh_token'
