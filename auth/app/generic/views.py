@@ -18,7 +18,7 @@ class APIView(HTTPMethodView):
         # itself) and re-assign it to the variables inside the class
 
     def deserialize(self, data):
-        result = self.schema().load(data)
+        result = self.schema().load(data or {})
         if result.errors:
             raise ValidationError(result.errors)
         return result.data
