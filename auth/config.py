@@ -34,7 +34,7 @@ MONGODB_USERNAME = os.environ.get("MONGODB_USERNAME", "user")
 MONGODB_PASSWORD = os.environ.get("MONGODB_PASSWORD", "password")
 MONGODB_HOST = os.environ.get("MONGODB_HOST", "mongodb")
 MONGODB_PORT = to_int(os.environ.get("MONGODB_PORT", 27017))
-MONGODB_DATABASE = os.environ.get("MONGODB_DATABASE", None)
+MONGODB_DATABASE = os.environ.get("MONGODB_DATABASE", "")
 MONGODB_URI = 'mongodb://{}:{}@{}:{}/{}'.format(
     MONGODB_USERNAME,
     MONGODB_PASSWORD,
@@ -52,3 +52,17 @@ JWT_AUTHORIZATION_HEADER_NAME = 'authorization'
 JWT_AUTHORIZATION_HEADER_PREFIX = 'JWT'
 JWT_ACCESS_TOKEN_FIELD_NAME = 'access_token'
 JWT_REFRESH_TOKEN_FIELD_NAME = 'refresh_token'
+
+# Settings for tests
+TEST_MONGODB_USERNAME = os.environ.get("TEST_MONGODB_USERNAME", "root")
+TEST_MONGODB_PASSWORD = os.environ.get("TEST_MONGODB_PASSWORD", "root")
+TEST_MONGODB_HOST = os.environ.get("MONGODB_HOST", "mongodb")
+TEST_MONGODB_PORT = to_int(os.environ.get("MONGODB_PORT", 27017))
+TEST_MONGODB_DATABASE = os.environ.get("MONGODB_DATABASE", 'test_database')
+TEST_MONGODB_URI = 'mongodb://{}:{}@{}:{}/'.format(
+    TEST_MONGODB_USERNAME,
+    TEST_MONGODB_PASSWORD,
+    TEST_MONGODB_HOST,
+    TEST_MONGODB_PORT,
+    TEST_MONGODB_DATABASE
+)

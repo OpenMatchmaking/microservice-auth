@@ -1,7 +1,5 @@
-from base import BaseSanicTestCase
-
-from app.users.documents import User
+from conftest import sanic_server
 
 
-class UserAPITestCase(BaseSanicTestCase):
-    document = User
+async def test_endpoint(sanic_server):
+    pass

@@ -1,1 +1,5 @@
-{}
+{
+  "tests/test_users_api.py::TestCase": true,
+  "tests/test_users_api.py::UserAPITestCase::test_some_test": true,
+  "tests/test_users_api.py::test_app": true
+}

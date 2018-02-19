@@ -16,5 +16,5 @@ class RunTestsCommand(Command):
 
     def run(self, *args, **kwargs):
         app = kwargs.get('application')
-        pytest.main(args=["-q", "-s", "--cov", app, "--cov-report",
+        pytest.main(args=["-q", "-v","--cov", app, "--cov-report",
                           "term-missing", "--tb=native"])
