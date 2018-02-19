@@ -16,9 +16,9 @@ MongoDbExtension(app)
 
 # Public API
 async def health_check(request):
-    return text('OK')
+    return text('OK.')
 
 
 app.blueprint(token_bp)
 app.blueprint(users_bp_v1)
-app.add_route(health_check, '/auth/api/health-check', methods=['GET', ])
+app.add_route(health_check, '/auth/api/health-check', methods=['GET', ], name='health-check')
