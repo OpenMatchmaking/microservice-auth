@@ -35,7 +35,9 @@ async def verify_token(request):
     try:
         raw_access_token = extract_token(request)
     except (MissingAuthorizationHeader, InvalidHeaderPrefix) as exc:
-        return json(exc.details, status=exc.status_code)
+        result = OrderedDict({"is_valid": False})
+        result.update(exc.details)
+        return json(result, status=exc.status_code)
 
     secret = request.app.config["JWT_SECRET_KEY"]
     algorithm = request.app.config["JWT_ALGORITHM"]

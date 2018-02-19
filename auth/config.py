@@ -23,9 +23,9 @@ APP_WORKERS = int((os.environ.get('APP_WORKERS', 1)))
 # Redis settings
 REDIS_HOST = os.environ.get('REDIS_HOST', "127.0.0.1")
 REDIS_PORT = to_int(os.environ.get('REDIS_PORT', "6379"))
-REDIS_DATABASE = None
-REDIS_SSL = None
-REDIS_ENCODING = os.environ.get('REDIS_SSL', None)
+REDIS_DATABASE = os.environ.get('REDIS_DATABASE', None)
+REDIS_SSL = False
+REDIS_ENCODING = os.environ.get('REDIS_ENCODING', None)
 REDIS_MIN_SIZE_POOL = to_int(os.environ.get('REDIS_MIN_SIZE_POOL', 1))
 REDIS_MAX_SIZE_POOL = to_int(os.environ.get('REDIS_MAX_SIZE_POOL', 10))
 
@@ -66,3 +66,11 @@ TEST_MONGODB_URI = 'mongodb://{}:{}@{}:{}/'.format(
     TEST_MONGODB_PORT,
     TEST_MONGODB_DATABASE
 )
+
+TEST_REDIS_HOST = os.environ.get('TEST_REDIS_HOST', "redis")
+TEST_REDIS_PORT = to_int(os.environ.get('TEST_REDIS_PORT', "6379"))
+TEST_REDIS_DATABASE = os.environ.get('TEST_REDIS_DATABASE', 1)
+TEST_REDIS_SSL = None
+TEST_REDIS_ENCODING = os.environ.get('TEST_REDIS_ENCODING', None)
+TEST_REDIS_MIN_SIZE_POOL = to_int(os.environ.get('TEST_REDIS_MIN_SIZE_POOL', 1))
+TEST_REDIS_MAX_SIZE_POOL = to_int(os.environ.get('TEST_REDIS_MAX_SIZE_POOL', 10))
