@@ -3,7 +3,7 @@ from sanic_script import Manager
 from app import app
 from app.commands.prepare_mongodb import PrepareMongoDbCommand
 from app.commands.run_tests import RunTestsCommand
-from app.commands.runserver import RunServerCommand
+from app.commands.run_server import RunServerCommand
 
 
 manager = Manager(app)
