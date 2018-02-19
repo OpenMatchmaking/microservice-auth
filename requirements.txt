@@ -10,6 +10,9 @@ bcrypt==3.1.4
 passlib==1.7.1
 pyjwt==1.5.3
 
+cchardet==2.1.1
+aiodns==1.1.1
+
 pytest==3.4.0
 pytest-cov==2.5.1
 pytest-sanic==0.1.8

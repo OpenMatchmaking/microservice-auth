@@ -1,5 +1,3 @@
-import logging
-
 import pytest
 from pymongo import MongoClient
 

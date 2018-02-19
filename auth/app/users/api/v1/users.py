@@ -22,7 +22,7 @@ class RegisterGameClientView(APIView):
         users = await self.document.find({"username": username}).count()
         if users:
             raise ValidationError(
-                "Username must be unique",
+                "Username must be unique.",
                 field_names=["username", ]
             )
 
@@ -31,7 +31,8 @@ class RegisterGameClientView(APIView):
             data = self.deserialize(request.json)
             await self.validate_username_for_uniqueness(data["username"])
         except ValidationError as exc:
-            return json(wrap_error(exc.normalized_messages()), status=400)
+            errors = exc.normalized_messages()
+            return json(wrap_error(errors), status=400)
 
         data['groups'] = await self.group_document\
             .find({"name": self.default_group_name})\
