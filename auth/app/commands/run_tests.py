@@ -25,5 +25,5 @@ class RunTestsCommand(Command):
     def run(self, *args, **kwargs):
         app = kwargs.get('application')
         self.setup_environ_for_pytest_cov()
-        pytest.main(args=["-q", "-v","--cov", app, "--cov-report",
+        pytest.main(args=["-q", "-v", "--cov", app, "--cov-report",
                           "term-missing", "--tb=native"])

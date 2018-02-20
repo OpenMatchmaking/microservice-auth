@@ -1,6 +1,4 @@
-from sanic.response import json
 from sanic.views import HTTPMethodView
-
 from marshmallow import ValidationError
 
 

@@ -37,7 +37,7 @@ class CreateUserSchema(BaseUserSchema):
     def validate_password_confirmation(self, data):
         if data['password'] != data['confirm_password']:
             raise ValidationError(
-                'Confirm password  must equal to a new password.',
+                'Confirm password must equal to a new password.',
                 field_names=['confirm_password', ]
             )
 

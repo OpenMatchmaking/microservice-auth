@@ -1,6 +1,6 @@
-from pymongo import IndexModel, TEXT
+from pymongo import TEXT
 from pymongo.collation import Collation
-from umongo import Instance, Document
+from umongo import Document
 from umongo.fields import StringField, ListField, ReferenceField
 
 from app import app

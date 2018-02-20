@@ -65,7 +65,8 @@ async def test_users_post_returns_validation_error_for_not_matched_password(sani
 
     assert 'confirm_password' in response_json['details']
     assert len(response_json['details']['confirm_password']) == 1
-    assert response_json['details']['confirm_password'][0] == 'Confirm password  must equal to a new password.'
+    assert response_json['details']['confirm_password'][0] == 'Confirm password must ' \
+                                                              'equal to a new password.'
 
 
 async def test_users_post_returns_validation_error_for_missing_fields(sanic_server):

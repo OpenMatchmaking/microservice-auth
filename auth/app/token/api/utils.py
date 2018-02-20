@@ -15,6 +15,7 @@ def get_redis_key_by_user(request, username):
         username=username
     )
 
+
 async def save_refresh_token_in_redis(redis_pool, key, token):
     with await redis_pool as redis:
         await redis.execute('set', key, token)

@@ -1,4 +1,4 @@
-from umongo import Instance, Document
+from umongo import Document
 from umongo.fields import StringField
 
 from app import app

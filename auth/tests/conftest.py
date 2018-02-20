@@ -26,7 +26,7 @@ def app_factory():
         "REDIS_HOST": sanic_app.config["TEST_REDIS_HOST"],
         "REDIS_PORT": sanic_app.config["TEST_REDIS_PORT"],
         "REDIS_DATABASE": sanic_app.config["TEST_REDIS_DATABASE"],
-        "REDIS_SSL":sanic_app.config["TEST_REDIS_SSL"],
+        "REDIS_SSL": sanic_app.config["TEST_REDIS_SSL"],
         "REDIS_ENCODING": sanic_app.config["TEST_REDIS_ENCODING"],
         "REDIS_MIN_SIZE_POOL": sanic_app.config["TEST_REDIS_MIN_SIZE_POOL"],
         "REDIS_MAX_SIZE_POOL": sanic_app.config["TEST_REDIS_MAX_SIZE_POOL"],
