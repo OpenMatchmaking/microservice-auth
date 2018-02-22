@@ -44,6 +44,14 @@ MONGODB_URI = 'mongodb://{}:{}@{}:{}/{}'.format(
 )
 LAZY_UMONGO = MotorAsyncIOInstance()
 
+# AMQP settings
+AMQP_USERNAME = os.environ.get("AMQP_USERNAME", "user")
+AMQP_PASSWORD = os.environ.get("AMQP_PASSWORD", "password")
+AMQP_HOST = os.environ.get("AMQP_HOST", "rabbitmq")
+AMQP_PORT = to_int(os.environ.get("AMQP_PORT", 5672))
+AMQP_VIRTUAL_HOST = os.environ.get("AMQP_VIRTUAL_HOST", "vhost")
+AMQP_USING_SSL = to_bool(os.environ.get("AMQP_USING_SSL", False))
+
 # Settings for setting up JWT
 JWT_ALGORITHM = 'HS256'
 JWT_LIFETIME = 60 * 30

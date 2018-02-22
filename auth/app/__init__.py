@@ -1,8 +1,9 @@
 from sanic import Sanic
 from sanic.response import text
 
-from app.extensions.redis import RedisExtension
+from app.extensions.amqp import AmqpExtension
 from app.extensions.mongodb import MongoDbExtension
+from app.extensions.redis import RedisExtension
 from app.token.api.blueprints import token_bp
 from app.users.api.blueprints import users_bp_v1
 
@@ -12,8 +13,9 @@ app.config.from_envvar('APP_CONFIG_PATH')
 
 
 # Extensions
-RedisExtension(app)
+AmqpExtension(app)
 MongoDbExtension(app)
+RedisExtension(app)
 
 
 # Public API
