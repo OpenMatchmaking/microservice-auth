@@ -6,7 +6,7 @@ async def test_health_check_returns_ok(sanic_server):
     response = await sanic_server.get(url)
     response_body = await response.text()
     assert response.status == 200
-    assert response_body == 'OK.'
+    assert response_body == 'OK'
 
 
 async def test_health_check_post_not_allowed(sanic_server):

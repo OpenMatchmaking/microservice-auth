@@ -20,7 +20,7 @@ RedisExtension(app)
 
 # Public API
 async def health_check(request):
-    return text('OK.')
+    return text('OK')
 
 
 app.blueprint(token_bp)
