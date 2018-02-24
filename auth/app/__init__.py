@@ -1,9 +1,9 @@
 from sanic import Sanic
 from sanic.response import text
+from sanic_mongodb_ext import MongoDbExtension
+from sanic_redis_ext import RedisExtension
 
 from app.extensions.amqp import AmqpExtension
-from app.extensions.mongodb import MongoDbExtension
-from app.extensions.redis import RedisExtension
 from app.token.api.blueprints import token_bp
 from app.users.api.blueprints import users_bp_v1
 

@@ -1,7 +1,6 @@
 from aioamqp import connect as amqp_connect
 from sanic import Sanic
-
-from app.extensions.base import BaseExtension
+from sanic_base_ext import BaseExtension
 
 
 class AmqpExtension(BaseExtension):
