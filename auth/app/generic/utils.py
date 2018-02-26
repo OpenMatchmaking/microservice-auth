@@ -1,3 +1,4 @@
+CONTENT_FIELD_NAME = 'content'
 ERROR_FIELD_NAME = 'details'
 
 
