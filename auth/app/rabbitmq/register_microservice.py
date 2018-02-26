@@ -1,8 +1,10 @@
 import json
 
 from aioamqp import AmqpClosedConnection
+from marshmallow import ValidationError
 
 from app.extensions.amqp import AmqpWorker
+from app.generic.utils import CONTENT_FIELD_NAME, wrap_error
 
 
 class RegisterMicroserviceWorker(AmqpWorker):
@@ -11,12 +13,44 @@ class RegisterMicroserviceWorker(AmqpWorker):
     RESPONSE_EXCHANGE_NAME = 'open-matchmaking.responses.direct'
     CONTENT_TYPE = 'application/json'
 
-    def validate_data(self, data):
-        return json.loads(data)
+    def __init__(self, app, *args, **kwargs):
+        super(RegisterMicroserviceWorker, self).__init__(app, *args, **kwargs)
+        from app.microservices.documents import Microservice
+        from app.groups.documents import Group
+        from app.permissions.documents import Permission
+        from app.microservices.schemas import MicroserviceSchema
 
-    # TODO: Implement validating JSON data and fill the MongoDB if it's valid
+        self.microservice_document = Microservice
+        self.schema = MicroserviceSchema
+        self.group_document = Group
+        self.permission_document = Permission
+
+    def validate_data(self, raw_data):
+        try:
+            data = json.loads(raw_data.strip())
+        except json.decoder.JSONDecodeError:
+            data = {}
+
+        result = self.schema().load(data)
+        if result.errors:
+            raise ValidationError(result.errors)
+
+        return result.data
+
+    async def register_microservice(self, raw_data):
+        try:
+            data = self.validate_data(raw_data)
+        except ValidationError as exc:
+            response = wrap_error(exc.normalized_messages())
+            response.update({'status': 400})
+            return response
+
+        # await self.microservice_document.create_or_update(data)
+        return {CONTENT_FIELD_NAME: "OK", "status": 200}
+
     async def process_request(self, channel, body, envelope, properties):
-        response = self.validate_data(body)
+        response = await self.register_microservice(body)
+        print(response)
 
         if properties.reply_to:
             await channel.publish(
