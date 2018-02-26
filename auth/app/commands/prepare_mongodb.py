@@ -15,9 +15,6 @@ class PrepareMongoDbCommand(Command):
     Clean up and fill the MongoDB with default data.
     """
     app = app
-    default_groups = [
-        {"name": "Game client", "permissions": []},
-    ]
 
     def clean_collections(self):
         print("Clearing collections...")
@@ -40,7 +37,7 @@ class PrepareMongoDbCommand(Command):
 
     async def create_default_groups(self):
         print("Creating default empty groups...")
-        for data in self.default_groups:
+        for data in self.app.config['DEFAULT_GROUPS']:
             Group.ensure_indexes()
             await Group(**data).commit()
         print('Creating has completed!')

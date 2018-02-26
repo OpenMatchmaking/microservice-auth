@@ -82,3 +82,8 @@ TEST_REDIS_SSL = None
 TEST_REDIS_ENCODING = os.environ.get('TEST_REDIS_ENCODING', None)
 TEST_REDIS_MIN_SIZE_POOL = to_int(os.environ.get('TEST_REDIS_MIN_SIZE_POOL', 1))
 TEST_REDIS_MAX_SIZE_POOL = to_int(os.environ.get('TEST_REDIS_MAX_SIZE_POOL', 10))
+
+# Application settings
+DEFAULT_GROUPS = [
+    {"name": "Game client", "permissions": []}
+]
