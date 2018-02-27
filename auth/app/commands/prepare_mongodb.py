@@ -37,8 +37,9 @@ class PrepareMongoDbCommand(Command):
 
     async def create_default_groups(self):
         print("Creating default empty groups...")
-        for data in self.app.config['DEFAULT_GROUPS']:
-            Group.ensure_indexes()
+        for group_name, config  in self.app.config['DEFAULT_GROUPS'].items():
+            data = {'name': group_name}
+            data.update(config.get('init', {}))
             await Group(**data).commit()
         print('Creating has completed!')
 
