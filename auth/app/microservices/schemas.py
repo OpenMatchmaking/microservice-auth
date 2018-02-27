@@ -1,4 +1,5 @@
 from marshmallow import UnmarshalResult
+from pymongo import UpdateOne
 
 from app import app
 
@@ -14,6 +15,20 @@ class MicroserviceSchema(Microservice.schema.as_marshmallow_schema()):
         if permissions.errors:
             errors_result.update({'permissions': permissions.errors})
 
+    async def load_permissions(self, data, result):
+        requests = [
+            UpdateOne({'codename': permission['codename']}, {'$set': permission}, upsert=True)
+            for permission in data
+        ]
+        await Permission.collection.bulk_write(requests)
+
+        pipeline = [
+            {'$match': {'$or': [{'codename': permission['codename']} for permission in data]}},
+            {'$group': {'_id': '_id', 'ids': {'$addToSet': '$_id'}}}
+        ]
+        permissions = await Permission.collection.aggregate(pipeline).to_list(1)
+        result['permissions'] = permissions[0]['ids']
+
     def load(self, data, *args, **kwargs):
         permissions_data = data.pop('permissions', [])
 
@@ -24,5 +39,5 @@ class MicroserviceSchema(Microservice.schema.as_marshmallow_schema()):
         if errors:
             return UnmarshalResult(data=None, errors=errors)
 
-        # self.load_permissions(permissions_data, result.data)
+        result.data['permissions'] = permissions_data
         return result
