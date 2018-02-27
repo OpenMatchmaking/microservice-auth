@@ -36,6 +36,9 @@ class RegisterMicroserviceWorker(AmqpWorker):
         await deserializer.load_permissions(result.data['permissions'], result.data)
         return result.data
 
+    async def update_groups(self, old_permissions, new_permissions):
+        await self.group_document.synchronize_permissions(old_permissions, new_permissions)
+
     async def register_microservice(self, raw_data):
         try:
             data = await self.validate_data(raw_data)
@@ -44,10 +47,15 @@ class RegisterMicroserviceWorker(AmqpWorker):
             response.update({'status': 400})
             return response
 
+        old_microservice = await self.microservice_document.find_one({'name': data['name']})
+        old_permissions = [obj.pk for obj in old_microservice.permissions] if old_microservice else []  # NOQA
+        new_permissions = data['permissions'][:]
+
         await self.microservice_document.collection.replace_one(
-            {'name': data['name'], 'version': data['version']},
-            data, upsert=True
+            {'name': data['name']}, replacement=data, upsert=True
         )
+
+        self.app.loop.create_task(self.update_groups(old_permissions, new_permissions))
         return {CONTENT_FIELD_NAME: "OK", "status": 200}
 
     async def process_request(self, channel, body, envelope, properties):
@@ -69,8 +77,7 @@ class RegisterMicroserviceWorker(AmqpWorker):
         await channel.basic_client_ack(delivery_tag=envelope.delivery_tag)
 
     async def consume_callback(self, channel, body, envelope, properties):
-        event_loop = self.app.loop
-        event_loop.create_task(self.process_request(channel, body, envelope, properties))
+        self.app.loop.create_task(self.process_request(channel, body, envelope, properties))
 
     async def run(self, *args, **kwargs):
         try:

@@ -84,13 +84,17 @@ TEST_REDIS_MIN_SIZE_POOL = to_int(os.environ.get('TEST_REDIS_MIN_SIZE_POOL', 1))
 TEST_REDIS_MAX_SIZE_POOL = to_int(os.environ.get('TEST_REDIS_MAX_SIZE_POOL', 10))
 
 # Application settings
-def game_client_filter(permission: str) -> bool:
-    return permission.endswith('.self-retrieve') or permission.endswith('.self-update')
-
-
+# `filter` key is a part of match expression for a MongoDB aggregation query, that will be
+# used for resolving which permissions are necessary to set to the certain group.
+# For more details read: https://docs.mongodb.com/manual/reference/operator/aggregation/match/
 DEFAULT_GROUPS = {
     "Game client": {
         "init": {"permissions": []},
-        "filter": game_client_filter
+        "filter": {
+            "$or": [
+                {"codename": {"$regex": ".retrieve$"}},
+                {"codename": {"$regex": ".delete$"}},
+            ]
+        }
     }
 }

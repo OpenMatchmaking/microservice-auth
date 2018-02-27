@@ -16,18 +16,28 @@ class MicroserviceSchema(Microservice.schema.as_marshmallow_schema()):
             errors_result.update({'permissions': permissions.errors})
 
     async def load_permissions(self, data, result):
-        requests = [
-            UpdateOne({'codename': permission['codename']}, {'$set': permission}, upsert=True)
-            for permission in data
-        ]
-        await Permission.collection.bulk_write(requests)
+        permissions = []
 
-        pipeline = [
-            {'$match': {'$or': [{'codename': permission['codename']} for permission in data]}},
-            {'$group': {'_id': '_id', 'ids': {'$addToSet': '$_id'}}}
-        ]
-        permissions = await Permission.collection.aggregate(pipeline).to_list(1)
-        result['permissions'] = permissions[0]['ids']
+        if data:
+            requests = [
+                UpdateOne({'codename': permission['codename']}, {'$set': permission}, upsert=True)
+                for permission in data
+            ]
+            await Permission.collection.bulk_write(requests)
+
+            pipeline = [
+                {'$match': {
+                    '$or': [
+                        {'codename': permission['codename']}
+                        for permission in data
+                    ]
+                }},
+                {'$group': {'_id': None, 'ids': {'$addToSet': '$_id'}}}
+            ]
+            query_result = await Permission.collection.aggregate(pipeline).to_list(1)
+            permissions = query_result[0]['ids'] if query_result else []
+
+        result['permissions'] = permissions
 
     def load(self, data, *args, **kwargs):
         permissions_data = data.pop('permissions', [])

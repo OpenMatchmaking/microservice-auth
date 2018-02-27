@@ -12,7 +12,7 @@ instance = app.config["LAZY_UMONGO"]
 class Microservice(Document):
     name = StringField(unique=True, allow_none=False, required=True)
     version = StringField(
-        unique=True,
+        unique=False,
         allow_none=False,
         required=True,
         validate=validate.Regexp(
@@ -23,4 +23,4 @@ class Microservice(Document):
     permissions = ListField(ReferenceField(Permission))
 
     class Meta:
-        indexes = ['$name', '$version']
+        indexes = ['$name', ]
