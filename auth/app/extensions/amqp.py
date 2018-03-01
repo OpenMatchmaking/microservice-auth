@@ -31,9 +31,9 @@ class AmqpExtension(BaseExtension):
             "ssl": self.get_from_app_config(app, "AMQP_USING_SSL", False),
         }
 
-    async def connect(self):
+    async def connect(self, loop=None):
         config = self.get_config(self.app)
-        config.update({"loop": self.app.loop})
+        config.update({"loop": loop or self.app.loop})
         transport, protocol = await amqp_connect(**config)
         return transport, protocol
 
