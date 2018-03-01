@@ -4,7 +4,7 @@ from sanic_mongodb_ext import MongoDbExtension
 from sanic_redis_ext import RedisExtension
 
 from app.extensions.amqp import AmqpExtension
-from app.rabbitmq.register_microservice import RegisterMicroserviceWorker
+from app.rabbitmq.workers import RegisterMicroserviceWorker
 from app.token.api.blueprints import token_bp
 from app.users.api.blueprints import users_bp_v1
 
