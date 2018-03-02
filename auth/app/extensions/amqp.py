@@ -14,6 +14,10 @@ class AmqpWorker(object):
     async def run(self, *args, **kwargs):
         raise NotImplementedError('`run(*args, **kwargs)` method must be implemented.')
 
+    async def connect(self):
+        self.transport, self.protocol = await self.app.amqp.connect()
+        return self.transport, self.protocol
+
     async def deinit(self):
         if self.protocol:
             if not self.protocol.worker.cancelled():
