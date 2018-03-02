@@ -93,7 +93,7 @@ DEFAULT_GROUPS = {
         "filter": {
             "$or": [
                 {"codename": {"$regex": ".retrieve$"}},
-                {"codename": {"$regex": ".delete$"}},
+                {"codename": {"$regex": ".update$"}},
             ]
         }
     }

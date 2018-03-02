@@ -75,12 +75,12 @@ class AmqpExtension(BaseExtension):
 
         @app.listener('after_server_stop')
         async def aioamqp_free_resources(app_inner, loop):
-            for worker in self.workers:
-                await worker.deinit()
-
             for task in self.active_tasks:
                 if not loop.is_closed and not task.cancelled():
                     task.cancel()
+
+            for worker in self.workers:
+                await worker.deinit()
 
             setattr(app_inner, self.app_attribute, None)
             extensions = getattr(app_inner, 'extensions', {})

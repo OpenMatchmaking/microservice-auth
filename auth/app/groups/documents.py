@@ -1,4 +1,4 @@
-from pymongo import TEXT, DeleteOne, ReplaceOne
+from pymongo import TEXT
 from pymongo.collation import Collation
 from umongo import Document
 from umongo.fields import StringField, ListField, ReferenceField

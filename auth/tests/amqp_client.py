@@ -62,7 +62,7 @@ class AmqpTestClient(object):
         self._response = json.loads(body)
         self.waiter.set()
 
-    async def send(self, payload={}, properties={}):
+    async def send(self, payload={}, properties={}, raw_data=False):
         if not self.protocol:
             await self.connect()
 
@@ -70,7 +70,7 @@ class AmqpTestClient(object):
         request_properties.update({'reply_to': self.response_queue_name})
         request_properties.update(properties)
         await self.channel.publish(
-            json.dumps(payload),
+            payload if raw_data else json.dumps(payload),
             exchange_name=self.request_exchange,
             routing_key=self.routing_key,
             properties=request_properties
@@ -82,4 +82,6 @@ class AmqpTestClient(object):
            response = self._response
 
         await self.protocol.close()
+        self.protocol = None
+        self.transport = None
         return response
