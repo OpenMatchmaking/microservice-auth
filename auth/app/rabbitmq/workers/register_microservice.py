@@ -81,12 +81,12 @@ class RegisterMicroserviceWorker(AmqpWorker):
 
     async def run(self, *args, **kwargs):
         try:
-            _transport, protocol = await self.app.amqp.connect()
+            self.transport, self.protocol = await self.app.amqp.connect()
         except AmqpClosedConnection as exc:
             print(exc)
             return
 
-        channel = await protocol.channel()
+        channel = await self.protocol.channel()
         await channel.queue_declare(
             queue_name=self.QUEUE_NAME,
             durable=True,
