@@ -12,9 +12,8 @@ class AmqpTestClient(object):
     }
 
     def __init__(self, app, routing_key, request_exchange='',
-                response_queue=None, response_exchange='', loop=None):
+                 response_queue=None, response_exchange=''):
         self.app = app
-        self.loop = loop
         self.routing_key = routing_key
         self.request_exchange = request_exchange
         self.response_queue = response_queue
@@ -32,7 +31,7 @@ class AmqpTestClient(object):
         return self._response_queue_name
 
     async def connect(self):
-        self.transport, self.protocol = await self.app.amqp.connect(self.loop)
+        self.transport, self.protocol = await self.app.amqp.connect()
         self.channel = await self.protocol.channel()
 
         if self.response_queue is not None:
