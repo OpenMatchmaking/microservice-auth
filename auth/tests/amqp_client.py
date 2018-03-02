@@ -45,7 +45,7 @@ class AmqpTestClient(object):
             self._response_queue_name = result['queue']
             await self.channel.queue_bind(
                 queue_name=self.response_queue_name,
-                exchange_name=self.request_exchange,
+                exchange_name=self.response_exchange,
                 routing_key=self.response_queue_name
             )
             await self.channel.basic_qos(
@@ -55,7 +55,7 @@ class AmqpTestClient(object):
             )
             await self.channel.basic_consume(
                 self.on_response,
-                queue_name=self.response_queue_name,
+                queue_name=self._response_queue_name,
             )
 
     async def on_response(self, _channel, body, _envelope, _properties):
