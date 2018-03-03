@@ -54,3 +54,20 @@ class CreateUserSchema(BaseUserSchema):
             'password',
             'confirm_password'
         )
+
+
+class UserProfileSchema(BaseUserSchema):
+    id = String(
+        dump_only=True,
+        description='Unique document identifier of a User.'
+    )
+    username = String(
+        dump_only=True,
+        description='Unique username.'
+    )
+
+    class Meta:
+        fields = (
+            'id',
+            'username',
+        )
