@@ -1,4 +1,4 @@
-from asyncio import sleep
+import asyncio
 from copy import deepcopy
 
 from amqp_client import AmqpTestClient
@@ -279,6 +279,7 @@ async def test_register_microservice_synchronize_new_permissions_for_game_client
     )
     response = await client.send(payload=create_data)
     microservice = await Microservice.collection.find_one({'name': create_data['name']})
+    await asyncio.sleep(1.0)
 
     assert 'status' in response.keys()
     assert response['status'] == 200
@@ -376,6 +377,7 @@ async def test_register_microservice_synchronize_deleted_permissions_for_game_cl
     assert CONTENT_FIELD_NAME in response.keys()
     assert response[CONTENT_FIELD_NAME] == "OK"
 
+    await asyncio.sleep(1.0)
     microservice = await Microservice.collection.find_one({'name': update_data['name']})
     assert microservice['name'] == update_data['name']
     assert microservice['version'] == update_data['version']

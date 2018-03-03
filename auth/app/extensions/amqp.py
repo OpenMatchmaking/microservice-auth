@@ -23,9 +23,6 @@ class AmqpWorker(object):
             if not self.protocol.worker.cancelled():
                 self.protocol.worker.cancel()
 
-            if not self.protocol._heartbeat_worker.cancelled():
-                self.protocol._heartbeat_worker.cancel()
-
             await self.protocol.close()
 
         if self.transport:
