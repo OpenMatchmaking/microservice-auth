@@ -2,8 +2,8 @@ import json
 
 from aioamqp import AmqpClosedConnection
 from marshmallow import ValidationError
+from sanic_amqp_ext import AmqpWorker
 
-from app.extensions.amqp import AmqpWorker
 from app.generic.utils import CONTENT_FIELD_NAME, wrap_error
 
 

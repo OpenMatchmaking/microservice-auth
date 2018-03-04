@@ -2,14 +2,14 @@ from collections import OrderedDict
 
 from bson.objectid import ObjectId
 from sanic.response import json
-from jwt.exceptions import InvalidIssuedAtError, ExpiredSignatureError, InvalidTokenError
+from jwt import InvalidIssuedAtError, ExpiredSignatureError, InvalidTokenError
 
 from app.generic.utils import wrap_error
-from app.token.api.exceptions import MissingAuthorizationHeader, InvalidHeaderPrefix
+from app.token.exceptions import MissingAuthorizationHeader, InvalidHeaderPrefix
+from app.token.json_web_token import build_payload, generate_token_pair, extract_token, \
+    decode_token, extract_and_decode_token, get_redis_key_by_user, generate_access_token
+from app.token.redis import get_refresh_token_from_redis
 from app.token.api.schemas import LoginSchema, RefreshTokenSchema
-from app.token.api.utils import build_payload, generate_token_pair, extract_token, \
-    decode_token, extract_and_decode_token, get_redis_key_by_user, get_refresh_token_from_redis, \
-    generate_access_token
 
 
 async def generate_tokens(request):

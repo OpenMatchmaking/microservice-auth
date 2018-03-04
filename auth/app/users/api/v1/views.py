@@ -1,12 +1,12 @@
 from bson.objectid import ObjectId
-from jwt.exceptions import InvalidTokenError
+from jwt import InvalidTokenError
 from sanic.response import json
 from marshmallow import ValidationError
 
 from app.generic.views import APIView
 from app.generic.utils import wrap_error
-from app.token.api.exceptions import MissingAuthorizationHeader, InvalidHeaderPrefix
-from app.token.api.utils import extract_and_decode_token
+from app.token.exceptions import MissingAuthorizationHeader, InvalidHeaderPrefix
+from app.token.json_web_token import extract_and_decode_token
 
 
 class RegisterGameClientView(APIView):
