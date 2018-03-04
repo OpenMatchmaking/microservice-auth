@@ -1,6 +1,6 @@
 from sanic import Blueprint
 
-from app.token.api.endpoints import generate_tokens, verify_token, refresh_token_pairs
+from app.token.api.views import generate_tokens, verify_token, refresh_token_pairs
 
 
 token_bp = Blueprint('json-web-token-api', url_prefix='auth/api/token')

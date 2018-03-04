@@ -1,6 +1,6 @@
 from sanic import Blueprint
 
-from app.users.api.v1.users import RegisterGameClientView, UserProfileView
+from app.users.api.v1.views import RegisterGameClientView, UserProfileView
 
 
 users_bp_v1 = Blueprint('users', url_prefix='auth/api/v1')
