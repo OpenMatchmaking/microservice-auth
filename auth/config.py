@@ -17,8 +17,13 @@ def to_int(value):
 APP_HOST = os.environ.get('APP_HOST', "127.0.0.1")
 APP_PORT = to_int(os.environ.get('APP_HOST', "8000"))
 APP_DEBUG = to_bool(os.environ.get('APP_DEBUG', False))
-APP_SSL = None
 APP_WORKERS = int((os.environ.get('APP_WORKERS', 1)))
+APP_SSL_CERT = os.environ.get('APP_SSL_CERT', None)
+APP_SSL_KEY = os.environ.get('APP_SSL_KEY', None)
+if APP_SSL_CERT and APP_SSL_KEY:
+    APP_SSL = {"cert": APP_SSL_CERT, "key": APP_SSL_KEY}
+else:
+    APP_SSL = None
 
 # Redis settings
 REDIS_HOST = os.environ.get('REDIS_HOST', "127.0.0.1")
