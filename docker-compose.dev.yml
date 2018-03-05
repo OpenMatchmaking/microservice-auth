@@ -13,6 +13,8 @@ services:
     image: microservice-auth
     environment:
       - APP_HOST=0.0.0.0
+      - APP_DEBUG=False
+      - APP_SERVER=none
       - APP_CONFIG_PATH=./config.py
       - REDIS_HOST=redis
       - MONGODB_USERNAME=user

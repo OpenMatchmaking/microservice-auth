@@ -1,5 +1,4 @@
-FROM python:3.6-slim-stretch
-RUN apt-get update && apt-get -y install gcc
+FROM openmatchmaking/docker-base-python-image:latest
 
 COPY requirements.txt /requirements.txt
 RUN pip install -r requirements.txt
