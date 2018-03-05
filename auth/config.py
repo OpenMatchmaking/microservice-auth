@@ -15,7 +15,7 @@ def to_int(value):
 
 
 APP_HOST = os.environ.get('APP_HOST', "127.0.0.1")
-APP_PORT = to_int(os.environ.get('APP_HOST', "8000"))
+APP_PORT = to_int(os.environ.get('APP_HOST', "80"))
 APP_DEBUG = to_bool(os.environ.get('APP_DEBUG', False))
 APP_WORKERS = int((os.environ.get('APP_WORKERS', 1)))
 APP_SSL_CERT = os.environ.get('APP_SSL_CERT', None)
