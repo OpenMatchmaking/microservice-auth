@@ -18,29 +18,27 @@ class PrepareMongoDbCommand(Command):
 
     def clean_collections(self):
         print("Clearing collections...")
-        User.collection.drop()
         User.ensure_indexes()
         print("User document was initialized...")
 
-        Group.collection.drop()
         Group.ensure_indexes()
         print("Group document was initialized...")
 
-        Permission.collection.drop()
         Permission.ensure_indexes()
         print("Permission document was initialized...")
 
-        Microservice.collection.drop()
         Microservice.ensure_indexes()
         print("Microservice document was initialized...")
         print("Done!")
 
     async def create_default_groups(self):
         print("Creating default empty groups...")
-        for group_name, config  in self.app.config['DEFAULT_GROUPS'].items():
+        for group_name, config in self.app.config['DEFAULT_GROUPS'].items():
             data = {'name': group_name}
-            data.update(config.get('init', {}))
-            await Group(**data).commit()
+            obj = await Group.collection.find_one(data)
+            if not obj:
+                data.update(config.get('init', {}))
+                await Group(**data).commit()
         print('Creating has completed!')
 
     def prepare_db(self, loop):
