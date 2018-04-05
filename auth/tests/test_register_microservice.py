@@ -1,14 +1,14 @@
 import asyncio
 from copy import deepcopy
 
-from amqp_client import AmqpTestClient
-from conftest import sanic_server  # NOQA
-
-from app.generic.utils import CONTENT_FIELD_NAME
+from app.generic.utils import ERROR_FIELD_NAME, CONTENT_FIELD_NAME, EVENT_FIELD_NAME, \
+    VALIDATION_ERROR
 from app.groups.documents import Group
 from app.microservices.documents import Microservice
 from app.permissions.documents import Permission
 from app.rabbitmq.workers import RegisterMicroserviceWorker
+
+from amqp_client import AmqpTestClient
 
 
 REQUEST_QUEUE = RegisterMicroserviceWorker.QUEUE_NAME
@@ -26,19 +26,25 @@ async def test_register_microservice_returns_validation_error_for_missing_fields
     )
     response = await client.send(payload={})
 
-    assert 'status' in response.keys()
-    assert response['status'] == 400
+    assert len(response.keys()) == 2
+    assert ERROR_FIELD_NAME in response.keys()
+    error = response[ERROR_FIELD_NAME]
 
-    assert 'details' in response.keys()
-    assert len(response['details'].keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
-    assert 'name' in response['details'].keys()
-    assert len(response['details']['name']) == 1
-    assert response['details']['name'][0] == 'Missing data for required field.'
+    assert 'type' in error.keys()
+    assert error["type"] == VALIDATION_ERROR
 
-    assert 'version' in response['details'].keys()
-    assert len(response['details']['version']) == 1
-    assert response['details']['version'][0] == 'Missing data for required field.'
+    assert 'message' in error.keys()
+    assert len(error['message'].keys()) == 2
+
+    assert 'name' in error['message'].keys()
+    assert len(error['message']['name']) == 1
+    assert error['message']['name'][0] == 'Missing data for required field.'
+
+    assert 'version' in error['message'].keys()
+    assert len(error['message']['version']) == 1
+    assert error['message']['version'][0] == 'Missing data for required field.'
 
 
 async def test_register_microservice_returns_validation_error_for_invalid_data(sanic_server):
@@ -51,19 +57,25 @@ async def test_register_microservice_returns_validation_error_for_invalid_data(s
     )
     response = await client.send(payload=b'INVALID_DATA', raw_data=True)
 
-    assert 'status' in response.keys()
-    assert response['status'] == 400
+    assert len(response.keys()) == 2
+    assert ERROR_FIELD_NAME in response.keys()
+    error = response[ERROR_FIELD_NAME]
 
-    assert 'details' in response.keys()
-    assert len(response['details'].keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
-    assert 'name' in response['details'].keys()
-    assert len(response['details']['name']) == 1
-    assert response['details']['name'][0] == 'Missing data for required field.'
+    assert 'type' in error.keys()
+    assert error['type'] == VALIDATION_ERROR
 
-    assert 'version' in response['details'].keys()
-    assert len(response['details']['version']) == 1
-    assert response['details']['version'][0] == 'Missing data for required field.'
+    assert 'message' in error.keys()
+    assert len(error['message'].keys()) == 2
+
+    assert 'name' in error['message'].keys()
+    assert len(error['message']['name']) == 1
+    assert error['message']['name'][0] == 'Missing data for required field.'
+
+    assert 'version' in error['message'].keys()
+    assert len(error['message']['version']) == 1
+    assert error['message']['version'][0] == 'Missing data for required field.'
 
 
 async def test_register_microservice_returns_validation_error_for_invalid_version(sanic_server):
@@ -81,16 +93,22 @@ async def test_register_microservice_returns_validation_error_for_invalid_versio
     }
     response = await client.send(payload=create_data)
 
-    assert 'status' in response.keys()
-    assert response['status'] == 400
+    assert len(response.keys()) == 2
+    assert ERROR_FIELD_NAME in response.keys()
+    error = response[ERROR_FIELD_NAME]
 
-    assert 'details' in response.keys()
-    assert len(response['details'].keys()) == 1
+    assert EVENT_FIELD_NAME in response.keys()
 
-    assert 'version' in response['details'].keys()
-    assert len(response['details']['version']) == 1
-    assert response['details']['version'][0] == "Field value must match the " \
-                                                "`major.minor.patch` version semantics."
+    assert 'type' in error.keys()
+    assert error['type'] == VALIDATION_ERROR
+
+    assert 'message' in error.keys()
+    assert len(error['message'].keys()) == 1
+
+    assert 'version' in error['message'].keys()
+    assert len(error['message']['version']) == 1
+    assert error['message']['version'][0] == "Field value must match the " \
+                                             "`major.minor.patch` version semantics."
 
 
 async def test_register_microservice_creates_new_microservice_with_permissions(sanic_server):
@@ -115,8 +133,8 @@ async def test_register_microservice_creates_new_microservice_with_permissions(s
     response = await client.send(payload=create_data)
     instance = await Microservice.collection.find_one({'name': create_data['name']})
 
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
     assert CONTENT_FIELD_NAME in response.keys()
     assert response[CONTENT_FIELD_NAME] == "OK"
@@ -144,17 +162,24 @@ async def test_register_microservice_returns_validation_error_for_invalid_permis
     )
     response = await client.send(payload=create_data)
 
-    assert 'status' in response.keys()
-    assert response['status'] == 400
+    assert len(response.keys()) == 2
+    assert ERROR_FIELD_NAME in response.keys()
+    error = response[ERROR_FIELD_NAME]
 
-    assert 'details' in response.keys()
-    assert len(response['details'].keys()) == 1
+    assert EVENT_FIELD_NAME in response.keys()
 
-    assert len(response['details']['permissions']) == 1
-    assert len(response['details']['permissions']['0']) == 1
-    assert 'codename' in response['details']['permissions']['0'].keys()
-    assert len(response['details']['permissions']['0']['codename']) == 1
-    assert response['details']['permissions']['0']['codename'][0] == 'Not a valid string.'
+    assert "type" in error.keys()
+    assert error["type"] == VALIDATION_ERROR
+
+    assert 'message' in error.keys()
+    assert len(error['message'].keys()) == 1
+
+    assert 'permissions' in error["message"].keys()
+    assert len(error["message"]['permissions']) == 1
+    assert len(error["message"]['permissions']['0']) == 1
+    assert 'codename' in error["message"]['permissions']['0'].keys()
+    assert len(error["message"]['permissions']['0']['codename']) == 1
+    assert error["message"]['permissions']['0']['codename'][0] == 'Not a valid string.'
 
 
 async def test_register_microservice_returns_validation_error_for_invalid_codename_format(sanic_server):  # NOQA
@@ -174,19 +199,26 @@ async def test_register_microservice_returns_validation_error_for_invalid_codena
     )
     response = await client.send(payload=create_data)
 
-    assert 'status' in response.keys()
-    assert response['status'] == 400
+    assert len(response.keys()) == 2
+    assert ERROR_FIELD_NAME in response.keys()
+    error = response[ERROR_FIELD_NAME]
 
-    assert 'details' in response.keys()
-    assert len(response['details'].keys()) == 1
+    assert EVENT_FIELD_NAME in response.keys()
 
-    assert len(response['details']['permissions']) == 1
-    assert len(response['details']['permissions']['0']) == 1
-    assert 'codename' in response['details']['permissions']['0'].keys()
-    assert len(response['details']['permissions']['0']['codename']) == 1
-    assert response['details']['permissions']['0']['codename'][0] == "Field value can contain " \
-                                                                     "only 'a'-'z', '.', '-' " \
-                                                                     "characters."
+    assert "type" in error.keys()
+    assert error["type"] == VALIDATION_ERROR
+
+    assert 'message' in error.keys()
+    assert len(error['message'].keys()) == 1
+
+    assert 'permissions' in error["message"].keys()
+    assert len(error["message"]['permissions']) == 1
+    assert len(error["message"]['permissions']['0']) == 1
+    assert 'codename' in error["message"]['permissions']['0'].keys()
+    assert len(error["message"]['permissions']['0']['codename']) == 1
+    assert error["message"]['permissions']['0']['codename'][0] == "Field value can contain " \
+                                                                  "only 'a'-'z', '.', '-' " \
+                                                                  "characters."
 
 
 async def test_register_microservice_creates_new_microservice_without_permissions(sanic_server):
@@ -207,8 +239,8 @@ async def test_register_microservice_creates_new_microservice_without_permission
     response = await client.send(payload=create_data)
     instance = await Microservice.collection.find_one({'name': create_data['name']})
 
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
     assert CONTENT_FIELD_NAME in response.keys()
     assert response[CONTENT_FIELD_NAME] == "OK"
@@ -242,8 +274,8 @@ async def test_register_microservice_updates_existing_microservice(sanic_server)
     response = await client.send(payload=update_data)
     new_instance = await Microservice.collection.find_one({'name': create_data['name']})
 
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
     assert CONTENT_FIELD_NAME in response.keys()
     assert response[CONTENT_FIELD_NAME] == "OK"
@@ -254,7 +286,7 @@ async def test_register_microservice_updates_existing_microservice(sanic_server)
     await Microservice.collection.delete_many({})
 
 
-async def test_register_microservice_synchronize_new_permissions_for_game_client_group(sanic_server):
+async def test_register_microservice_synchronize_new_permissions_for_game_client_group(sanic_server):  # NOQA
     for group_name, config in sanic_server.app.config['DEFAULT_GROUPS'].items():
         data = {'name': group_name}
         data.update(config.get('init', {}))
@@ -281,8 +313,8 @@ async def test_register_microservice_synchronize_new_permissions_for_game_client
     microservice = await Microservice.collection.find_one({'name': create_data['name']})
     await asyncio.sleep(1.0)
 
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
     assert CONTENT_FIELD_NAME in response.keys()
     assert response[CONTENT_FIELD_NAME] == "OK"
@@ -313,7 +345,7 @@ async def test_register_microservice_synchronize_new_permissions_for_game_client
     await Microservice.collection.delete_many({})
 
 
-async def test_register_microservice_synchronize_deleted_permissions_for_game_client_group(sanic_server):
+async def test_register_microservice_synchronize_deleted_permissions_for_game_client_group(sanic_server):  # NOQA
     for group_name, config in sanic_server.app.config['DEFAULT_GROUPS'].items():
         data = {'name': group_name}
         data.update(config.get('init', {}))
@@ -339,8 +371,8 @@ async def test_register_microservice_synchronize_deleted_permissions_for_game_cl
     response = await client.send(payload=create_data)
     microservice = await Microservice.collection.find_one({'name': create_data['name']})
 
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
     assert CONTENT_FIELD_NAME in response.keys()
     assert response[CONTENT_FIELD_NAME] == "OK"
@@ -371,8 +403,8 @@ async def test_register_microservice_synchronize_deleted_permissions_for_game_cl
     update_data['permissions'] = update_data['permissions'][:1]
     response = await client.send(payload=update_data)
 
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
 
     assert CONTENT_FIELD_NAME in response.keys()
     assert response[CONTENT_FIELD_NAME] == "OK"

@@ -1,14 +1,15 @@
 import asyncio
 import json
 
-from amqp_client import AmqpTestClient
-from conftest import sanic_server  # NOQA
-
+from app.generic.utils import CONTENT_FIELD_NAME, EVENT_FIELD_NAME, ERROR_FIELD_NAME, \
+    AUTHORIZATION_ERROR, TOKEN_ERROR, NOT_FOUND_ERROR, HEADER_ERROR
 from app.groups.documents import Group
 from app.microservices.documents import Microservice
 from app.permissions.documents import Permission
 from app.rabbitmq.workers import RegisterMicroserviceWorker
 from app.users.documents import User
+
+from amqp_client import AmqpTestClient
 
 
 USER_PROFILE = 'users.profile'
@@ -50,8 +51,10 @@ async def test_user_profile_returns_an_information_about_the_user(sanic_server):
     )
     response = await client.send(payload=create_data)
     await asyncio.sleep(1.0)
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
+    assert CONTENT_FIELD_NAME in response.keys()
+    assert response[CONTENT_FIELD_NAME] == "OK"
 
     # Get a new token for the user
     url = sanic_server.app.url_for(CREATE_TOKEN)
@@ -123,8 +126,10 @@ async def test_user_profile_returns_an_information_about_the_user_after_microser
     )
     response = await client.send(payload=create_data)
     await asyncio.sleep(1.0)
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
+    assert CONTENT_FIELD_NAME in response.keys()
+    assert response[CONTENT_FIELD_NAME] == "OK"
 
     # Get a new token for the user
     url = sanic_server.app.url_for(CREATE_TOKEN)
@@ -170,8 +175,10 @@ async def test_user_profile_returns_an_information_about_the_user_after_microser
     }
     response = await client.send(payload=create_data)
     await asyncio.sleep(1.0)
-    assert 'status' in response.keys()
-    assert response['status'] == 200
+    assert len(response.keys()) == 2
+    assert EVENT_FIELD_NAME in response.keys()
+    assert CONTENT_FIELD_NAME in response.keys()
+    assert response[CONTENT_FIELD_NAME] == "OK"
 
     # And check the updates
     url = sanic_server.app.url_for(USER_PROFILE)
@@ -206,8 +213,16 @@ async def test_user_profile_returns_bad_request_for_missing_authorization_header
 
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert 'details' in response_json.keys()
-    assert response_json['details'] == "Authorization header isn't set in request."
+
+    assert ERROR_FIELD_NAME in response_json.keys()
+    assert EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[ERROR_FIELD_NAME]
+
+    assert 'type' in error.keys()
+    assert error['type'] == AUTHORIZATION_ERROR
+
+    assert 'message' in error.keys()
+    assert error['message'] == "Authorization header isn't set in request."
 
 
 async def test_user_profile_returns_bad_request_for_invalid_header_prefix(sanic_server):
@@ -234,8 +249,16 @@ async def test_user_profile_returns_bad_request_for_invalid_header_prefix(sanic_
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert 'details' in response_json.keys()
-    assert response_json['details'] == 'Before the token necessary to specify the `JWT` prefix.'
+
+    assert ERROR_FIELD_NAME in response_json.keys()
+    assert EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[ERROR_FIELD_NAME]
+
+    assert 'type' in error.keys()
+    assert error['type'] == HEADER_ERROR
+
+    assert 'message' in error.keys()
+    assert error['message'] == 'Before the token necessary to specify the `JWT` prefix.'
 
     await User.collection.delete_many({})
 
@@ -267,8 +290,16 @@ async def test_user_profile_returns_validation_error_for_invalid_token(sanic_ser
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert 'details' in response_json.keys()
-    assert response_json['details'] == 'Signature verification failed.'
+
+    assert ERROR_FIELD_NAME in response_json.keys()
+    assert EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[ERROR_FIELD_NAME]
+
+    assert 'type' in error.keys()
+    assert error['type'] == TOKEN_ERROR
+
+    assert 'message' in error.keys()
+    assert error['message'] == 'Signature verification failed.'
 
     await User.collection.delete_many({})
 
@@ -301,8 +332,15 @@ async def test_user_profile_returns_user_wasnot_found_error(sanic_server):
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert 'details' in response_json.keys()
-    assert response_json['details'] == 'User was not found.'
+    assert ERROR_FIELD_NAME in response_json.keys()
+    assert EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[ERROR_FIELD_NAME]
+
+    assert 'type' in error.keys()
+    assert error['type'] == NOT_FOUND_ERROR
+
+    assert 'message' in error.keys()
+    assert error['message'] == 'User was not found.'
 
     await User.collection.delete_many({})
 
