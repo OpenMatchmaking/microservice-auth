@@ -4,7 +4,7 @@ from aioamqp import AmqpClosedConnection
 from marshmallow import ValidationError
 from sanic_amqp_ext import AmqpWorker
 
-from app.generic.utils import CONTENT_FIELD_NAME, wrap_error
+from app.generic.utils import CONTENT_FIELD_NAME, EVENT_FIELD_NAME, VALIDATION_ERROR, wrap_error
 
 
 class RegisterMicroserviceWorker(AmqpWorker):
@@ -43,9 +43,7 @@ class RegisterMicroserviceWorker(AmqpWorker):
         try:
             data = await self.validate_data(raw_data)
         except ValidationError as exc:
-            response = wrap_error(exc.normalized_messages())
-            response.update({'status': 400})
-            return response
+            return wrap_error(VALIDATION_ERROR, exc.normalized_messages())
 
         old_microservice = await self.microservice_document.find_one({'name': data['name']})
         old_permissions = [obj.pk for obj in old_microservice.permissions] if old_microservice else []  # NOQA
@@ -56,10 +54,11 @@ class RegisterMicroserviceWorker(AmqpWorker):
         )
 
         self.app.loop.create_task(self.update_groups(old_permissions, new_permissions))
-        return {CONTENT_FIELD_NAME: "OK", "status": 200}
+        return {CONTENT_FIELD_NAME: "OK"}
 
     async def process_request(self, channel, body, envelope, properties):
         response = await self.register_microservice(body)
+        response[EVENT_FIELD_NAME] = properties.correlation_id
 
         if properties.reply_to:
             await channel.publish(
