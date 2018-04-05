@@ -78,8 +78,8 @@ class AmqpTestClient(object):
 
         response = None
         if self.response_queue_name is not None:
-           await self.waiter.wait()
-           response = self._response
+            await self.waiter.wait()
+            response = self._response
 
         await self.protocol.close()
         self.protocol = None
