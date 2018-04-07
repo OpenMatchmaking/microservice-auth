@@ -1,7 +1,8 @@
 import json
 
-from app.generic.utils import ERROR_FIELD_NAME, EVENT_FIELD_NAME, AUTHORIZATION_ERROR, \
-    HEADER_ERROR, TOKEN_ERROR
+from sage_utils.constants import AUTHORIZATION_ERROR, HEADER_ERROR, TOKEN_ERROR
+from sage_utils.wrappers import Response
+
 from app.users.documents import User
 
 
@@ -46,9 +47,9 @@ async def test_refresh_token_returns_error_for_a_missing_authorization_header(sa
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == AUTHORIZATION_ERROR
@@ -84,9 +85,9 @@ async def test_refresh_token_return_error_for_a_missing_header_prefix(sanic_serv
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == HEADER_ERROR
@@ -125,9 +126,9 @@ async def test_refresh_token_return_error_for_an_invalid_header_prefix(sanic_ser
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == HEADER_ERROR
@@ -169,9 +170,9 @@ async def test_refresh_token_return_error_for_an_invalid_access_token(sanic_serv
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == TOKEN_ERROR
@@ -210,9 +211,9 @@ async def test_refresh_token_return_error_for_a_missing_refresh_token(sanic_serv
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == TOKEN_ERROR
@@ -257,9 +258,9 @@ async def test_refresh_token_return_error_for_an_refresh_token(sanic_server):
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == TOKEN_ERROR

@@ -1,8 +1,9 @@
 import asyncio
 from copy import deepcopy
 
-from app.generic.utils import ERROR_FIELD_NAME, CONTENT_FIELD_NAME, EVENT_FIELD_NAME, \
-    VALIDATION_ERROR
+from sage_utils.constants import VALIDATION_ERROR
+from sage_utils.wrappers import Response
+
 from app.groups.documents import Group
 from app.microservices.documents import Microservice
 from app.permissions.documents import Permission
@@ -27,10 +28,8 @@ async def test_register_microservice_returns_validation_error_for_missing_fields
     response = await client.send(payload={})
 
     assert len(response.keys()) == 2
-    assert ERROR_FIELD_NAME in response.keys()
-    error = response[ERROR_FIELD_NAME]
-
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error["type"] == VALIDATION_ERROR
@@ -58,10 +57,8 @@ async def test_register_microservice_returns_validation_error_for_invalid_data(s
     response = await client.send(payload=b'INVALID_DATA', raw_data=True)
 
     assert len(response.keys()) == 2
-    assert ERROR_FIELD_NAME in response.keys()
-    error = response[ERROR_FIELD_NAME]
-
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == VALIDATION_ERROR
@@ -94,10 +91,8 @@ async def test_register_microservice_returns_validation_error_for_invalid_versio
     response = await client.send(payload=create_data)
 
     assert len(response.keys()) == 2
-    assert ERROR_FIELD_NAME in response.keys()
-    error = response[ERROR_FIELD_NAME]
-
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == VALIDATION_ERROR
@@ -134,10 +129,10 @@ async def test_register_microservice_creates_new_microservice_with_permissions(s
     instance = await Microservice.collection.find_one({'name': create_data['name']})
 
     assert len(response.keys()) == 2
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
 
-    assert CONTENT_FIELD_NAME in response.keys()
-    assert response[CONTENT_FIELD_NAME] == "OK"
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    assert response[Response.CONTENT_FIELD_NAME] == "OK"
 
     assert instance['name'] == create_data['name']
     assert instance['version'] == create_data['version']
@@ -163,10 +158,8 @@ async def test_register_microservice_returns_validation_error_for_invalid_permis
     response = await client.send(payload=create_data)
 
     assert len(response.keys()) == 2
-    assert ERROR_FIELD_NAME in response.keys()
-    error = response[ERROR_FIELD_NAME]
-
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert "type" in error.keys()
     assert error["type"] == VALIDATION_ERROR
@@ -200,10 +193,8 @@ async def test_register_microservice_returns_validation_error_for_invalid_codena
     response = await client.send(payload=create_data)
 
     assert len(response.keys()) == 2
-    assert ERROR_FIELD_NAME in response.keys()
-    error = response[ERROR_FIELD_NAME]
-
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert "type" in error.keys()
     assert error["type"] == VALIDATION_ERROR
@@ -240,10 +231,10 @@ async def test_register_microservice_creates_new_microservice_without_permission
     instance = await Microservice.collection.find_one({'name': create_data['name']})
 
     assert len(response.keys()) == 2
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
 
-    assert CONTENT_FIELD_NAME in response.keys()
-    assert response[CONTENT_FIELD_NAME] == "OK"
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    assert response[Response.CONTENT_FIELD_NAME] == "OK"
 
     assert instance['name'] == create_data['name']
     assert instance['permissions'] == create_data['permissions']
@@ -275,10 +266,10 @@ async def test_register_microservice_updates_existing_microservice(sanic_server)
     new_instance = await Microservice.collection.find_one({'name': create_data['name']})
 
     assert len(response.keys()) == 2
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
 
-    assert CONTENT_FIELD_NAME in response.keys()
-    assert response[CONTENT_FIELD_NAME] == "OK"
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    assert response[Response.CONTENT_FIELD_NAME] == "OK"
 
     assert old_instance.version != new_instance['version']
     assert new_instance['version'] == update_data['version']
@@ -314,10 +305,10 @@ async def test_register_microservice_synchronize_new_permissions_for_game_client
     await asyncio.sleep(1.0)
 
     assert len(response.keys()) == 2
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
 
-    assert CONTENT_FIELD_NAME in response.keys()
-    assert response[CONTENT_FIELD_NAME] == "OK"
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    assert response[Response.CONTENT_FIELD_NAME] == "OK"
 
     assert microservice['name'] == create_data['name']
     assert microservice['version'] == create_data['version']
@@ -372,10 +363,10 @@ async def test_register_microservice_synchronize_deleted_permissions_for_game_cl
     microservice = await Microservice.collection.find_one({'name': create_data['name']})
 
     assert len(response.keys()) == 2
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
 
-    assert CONTENT_FIELD_NAME in response.keys()
-    assert response[CONTENT_FIELD_NAME] == "OK"
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    assert response[Response.CONTENT_FIELD_NAME] == "OK"
 
     assert microservice['name'] == create_data['name']
     assert microservice['version'] == create_data['version']
@@ -404,10 +395,10 @@ async def test_register_microservice_synchronize_deleted_permissions_for_game_cl
     response = await client.send(payload=update_data)
 
     assert len(response.keys()) == 2
-    assert EVENT_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
 
-    assert CONTENT_FIELD_NAME in response.keys()
-    assert response[CONTENT_FIELD_NAME] == "OK"
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    assert response[Response.CONTENT_FIELD_NAME] == "OK"
 
     await asyncio.sleep(1.0)
     microservice = await Microservice.collection.find_one({'name': update_data['name']})

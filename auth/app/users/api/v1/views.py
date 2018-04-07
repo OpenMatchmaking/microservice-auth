@@ -1,10 +1,11 @@
 from bson.objectid import ObjectId
 from jwt import InvalidTokenError
 from sanic.response import json
+from sage_utils.constants import VALIDATION_ERROR, NOT_FOUND_ERROR, TOKEN_ERROR
+from sage_utils.wrappers import Response
 from marshmallow import ValidationError
 
 from app.generic.views import APIView
-from app.generic.utils import VALIDATION_ERROR, NOT_FOUND_ERROR, TOKEN_ERROR, wrap_error
 from app.token.exceptions import MissingAuthorizationHeader, InvalidHeaderPrefix
 from app.token.json_web_token import extract_and_decode_token
 
@@ -35,8 +36,9 @@ class RegisterGameClientView(APIView):
             data = self.deserialize(request.json)
             await self.validate_username_for_uniqueness(data["username"])
         except ValidationError as exc:
-            errors = exc.normalized_messages()
-            return json(wrap_error(VALIDATION_ERROR, errors), status=400)
+            response = Response.from_error(VALIDATION_ERROR, exc.normalized_messages())
+            response.data.pop(Response.EVENT_FIELD_NAME, None)
+            return json(response.data, status=400)
 
         data['groups'] = await self.group_document\
             .find({"name": self.default_group_name})\
@@ -65,14 +67,20 @@ class UserProfileView(APIView):
         try:
             token = extract_and_decode_token(request)
         except (MissingAuthorizationHeader, InvalidHeaderPrefix) as exc:
-            return json(exc.details, status=exc.status_code)
+            response = exc.details
+            response.pop(Response.EVENT_FIELD_NAME, None)
+            return json(response, status=exc.status_code)
         except InvalidTokenError as exc:
-            return json(wrap_error(TOKEN_ERROR, str(exc)), status=400)
+            response = Response.from_error(TOKEN_ERROR, str(exc))
+            response.data.pop(Response.EVENT_FIELD_NAME, None)
+            return json(response.data, status=400)
 
         user_id = token.get('user_id', None)
         user = await self.user_document.find_one({"_id": ObjectId(user_id)})
         if not user:
-            return json(wrap_error(NOT_FOUND_ERROR, "User was not found."), status=400)
+            response = Response.from_error(NOT_FOUND_ERROR, "User was not found.")
+            response.data.pop(Response.EVENT_FIELD_NAME, None)
+            return json(response.data, status=400)
 
         pipeline = [
             {'$match': {'_id': {'$in': [obj.pk for obj in user.groups]}}},

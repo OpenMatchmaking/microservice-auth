@@ -1,6 +1,6 @@
 from sanic.exceptions import SanicException
-
-from app.generic.utils import TOKEN_ERROR, AUTHORIZATION_ERROR, HEADER_ERROR, wrap_error
+from sage_utils.constants import TOKEN_ERROR, AUTHORIZATION_ERROR, HEADER_ERROR
+from sage_utils.wrappers import Response
 
 
 class BaseTokenException(SanicException):
@@ -13,7 +13,7 @@ class BaseTokenException(SanicException):
 
     @property
     def details(self):
-        return wrap_error(self.error_type, self.message)
+        return Response.from_error(self.error_type, self.message).data
 
 
 class MissingAuthorizationHeader(BaseTokenException):
@@ -33,4 +33,4 @@ class InvalidHeaderPrefix(BaseTokenException):
     @property
     def details(self):
         message = self.message.format(prefix=self.prefix)
-        return wrap_error(HEADER_ERROR, message)
+        return Response.from_error(HEADER_ERROR, message).data

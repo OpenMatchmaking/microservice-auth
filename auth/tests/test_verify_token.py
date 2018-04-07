@@ -1,9 +1,9 @@
 import json
 
 from freezegun import freeze_time
+from sage_utils.constants import HEADER_ERROR, AUTHORIZATION_ERROR, TOKEN_ERROR
+from sage_utils.wrappers import Response
 
-from app.generic.utils import CONTENT_FIELD_NAME, ERROR_FIELD_NAME, EVENT_FIELD_NAME, \
-    HEADER_ERROR, AUTHORIZATION_ERROR, TOKEN_ERROR
 from app.users.documents import User
 
 
@@ -33,7 +33,12 @@ async def test_verify_token_returns_is_valid_for_correct_access_token(sanic_serv
     response = await sanic_server.post(url, headers=headers)
     response_json = await response.json()
     assert response.status == 200
-    assert response_json == {'is_valid': True, CONTENT_FIELD_NAME: "OK"}
+
+    assert 'is_valid' in response_json.keys()
+    assert response_json['is_valid'] == True
+
+    assert Response.CONTENT_FIELD_NAME in response_json.keys()
+    assert response_json[Response.CONTENT_FIELD_NAME] == "OK"
 
     await User.collection.delete_one({'id': user.id})
 
@@ -47,10 +52,10 @@ async def test_verify_token_return_error_for_a_missing_authorization_header(sani
     assert 'is_valid' in response_json.keys()
     assert response_json['is_valid'] is False
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    assert CONTENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    assert Response.CONTENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == AUTHORIZATION_ERROR
@@ -85,10 +90,10 @@ async def test_verify_token_return_error_for_a_missing_header_prefix(sanic_serve
     assert 'is_valid' in response_json.keys()
     assert response_json['is_valid'] is False
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    assert CONTENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    assert Response.CONTENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == HEADER_ERROR
@@ -126,10 +131,10 @@ async def test_verify_token_return_error_for_an_invalid_header_prefix(sanic_serv
     assert 'is_valid' in response_json.keys()
     assert response_json['is_valid'] is False
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    assert CONTENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    assert Response.CONTENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == HEADER_ERROR
@@ -173,10 +178,10 @@ async def test_verify_token_return_error_for_expired_access_token(sanic_server):
     assert 'is_valid' in response_json.keys()
     assert response_json['is_valid'] is False
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    assert CONTENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    assert Response.CONTENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == TOKEN_ERROR
@@ -217,10 +222,10 @@ async def test_verify_token_return_error_for_invalid_access_token(sanic_server):
     assert 'is_valid' in response_json.keys()
     assert response_json['is_valid'] is False
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    assert CONTENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    assert Response.CONTENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == TOKEN_ERROR

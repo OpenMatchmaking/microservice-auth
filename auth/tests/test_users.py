@@ -1,6 +1,8 @@
 import json
 
-from app.generic.utils import ERROR_FIELD_NAME, EVENT_FIELD_NAME, VALIDATION_ERROR
+from sage_utils.constants import VALIDATION_ERROR
+from sage_utils.wrappers import Response
+
 from app.users.documents import User
 
 
@@ -37,9 +39,9 @@ async def test_users_post_returns_validation_error_for_non_unique_username(sanic
     response_json = await response.json()
     assert response.status == 400
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == VALIDATION_ERROR
@@ -65,9 +67,9 @@ async def test_users_post_returns_validation_error_for_not_matched_password(sani
     response_json = await response.json()
     assert response.status == 400
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == VALIDATION_ERROR
@@ -88,9 +90,9 @@ async def test_users_post_returns_validation_error_for_missing_fields(sanic_serv
     response_json = await response.json()
     assert response.status == 400
 
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == VALIDATION_ERROR

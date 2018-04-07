@@ -1,7 +1,8 @@
 import json
 
-from app.generic.utils import ERROR_FIELD_NAME, EVENT_FIELD_NAME, NOT_FOUND_ERROR, \
-    VALIDATION_ERROR
+from sage_utils.constants import NOT_FOUND_ERROR, VALIDATION_ERROR
+from sage_utils.wrappers import Response
+
 from app.users.documents import User
 
 
@@ -39,9 +40,9 @@ async def test_generate_token_returns_error_for_an_invalid_username(sanic_server
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == NOT_FOUND_ERROR
@@ -65,9 +66,9 @@ async def test_generate_token_returns_error_for_an_invalid_password(sanic_server
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
 
     assert 'type' in error.keys()
     assert error['type'] == NOT_FOUND_ERROR
@@ -84,9 +85,9 @@ async def test_generate_token_returns_validation_error_for_empty_body(sanic_serv
     response_json = await response.json()
     assert response.status == 400
     assert len(response_json.keys()) == 1
-    assert ERROR_FIELD_NAME in response_json.keys()
-    assert EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response_json.keys()
+    assert Response.EVENT_FIELD_NAME not in response_json.keys()
+    error = response_json[Response.ERROR_FIELD_NAME]
     assert len(error.keys()) == 2
 
     assert 'type' in error.keys()
