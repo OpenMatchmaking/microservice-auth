@@ -57,11 +57,11 @@ async def test_verify_token_return_error_for_a_missing_authorization_header(sani
     assert Response.CONTENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == AUTHORIZATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == AUTHORIZATION_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == "Authorization header isn't set in request."
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == "Authorization header isn't set in request."
 
 
 async def test_verify_token_return_error_for_a_missing_header_prefix(sanic_server):
@@ -95,11 +95,12 @@ async def test_verify_token_return_error_for_a_missing_header_prefix(sanic_serve
     assert Response.CONTENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == HEADER_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == HEADER_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == 'Before the token necessary to specify the `JWT` prefix.'
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == 'Before the token necessary to ' \
+                                                       'specify the `JWT` prefix.'
 
     await User.collection.delete_one({'id': user.id})
 
@@ -136,11 +137,12 @@ async def test_verify_token_return_error_for_an_invalid_header_prefix(sanic_serv
     assert Response.CONTENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == HEADER_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == HEADER_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == 'Before the token necessary to specify the `JWT` prefix.'
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == 'Before the token necessary to ' \
+                                                       'specify the `JWT` prefix.'
 
     await User.collection.delete_one({'id': user.id})
 
@@ -183,11 +185,11 @@ async def test_verify_token_return_error_for_expired_access_token(sanic_server):
     assert Response.CONTENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == TOKEN_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == TOKEN_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == 'Signature has expired.'
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == 'Signature has expired.'
 
     await User.collection.delete_one({'id': user.id})
 
@@ -227,11 +229,11 @@ async def test_verify_token_return_error_for_invalid_access_token(sanic_server):
     assert Response.CONTENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == TOKEN_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == TOKEN_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == 'Signature verification failed.'
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == 'Signature verification failed.'
 
     await User.collection.delete_one({'id': user.id})
 

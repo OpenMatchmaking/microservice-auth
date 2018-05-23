@@ -44,11 +44,12 @@ async def test_generate_token_returns_error_for_an_invalid_username(sanic_server
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == NOT_FOUND_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == NOT_FOUND_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == "User wasn't found or specified an invalid password."
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == "User wasn't found or " \
+                                                       "specified an invalid password."
 
     await User.collection.delete_many({})
 
@@ -70,11 +71,12 @@ async def test_generate_token_returns_error_for_an_invalid_password(sanic_server
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == NOT_FOUND_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == NOT_FOUND_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == "User wasn't found or specified an invalid password."
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == "User wasn't found or " \
+                                                       "specified an invalid password."
 
     await User.collection.delete_many({})
 
@@ -90,19 +92,21 @@ async def test_generate_token_returns_validation_error_for_empty_body(sanic_serv
     error = response_json[Response.ERROR_FIELD_NAME]
     assert len(error.keys()) == 2
 
-    assert 'type' in error.keys()
-    assert error["type"] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 2
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 2
 
-    assert 'username' in error['message'].keys()
-    assert len(error['message']['username']) == 1
-    assert error['message']['username'][0] == 'Missing data for required field.'
+    assert 'username' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['username']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['username'][0] == 'Missing data for ' \
+                                                                      'required field.'
 
-    assert 'password' in error['message'].keys()
-    assert len(error['message']['password']) == 1
-    assert error['message']['password'][0] == 'Missing data for required field.'
+    assert 'password' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['password']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['password'][0] == 'Missing data for ' \
+                                                                      'required field.'
 
 
 async def test_generate_token_get_not_allowed(sanic_server):
