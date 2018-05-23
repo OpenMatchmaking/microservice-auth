@@ -31,19 +31,21 @@ async def test_register_microservice_returns_validation_error_for_missing_fields
     assert Response.ERROR_FIELD_NAME in response.keys()
     error = response[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error["type"] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 2
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 2
 
-    assert 'name' in error['message'].keys()
-    assert len(error['message']['name']) == 1
-    assert error['message']['name'][0] == 'Missing data for required field.'
+    assert 'name' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['name']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['name'][0] == 'Missing data for ' \
+                                                                  'required field.'
 
-    assert 'version' in error['message'].keys()
-    assert len(error['message']['version']) == 1
-    assert error['message']['version'][0] == 'Missing data for required field.'
+    assert 'version' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['version']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['version'][0] == 'Missing data for ' \
+                                                                     'required field.'
 
 
 async def test_register_microservice_returns_validation_error_for_invalid_data(sanic_server):
@@ -60,19 +62,21 @@ async def test_register_microservice_returns_validation_error_for_invalid_data(s
     assert Response.ERROR_FIELD_NAME in response.keys()
     error = response[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 2
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 2
 
-    assert 'name' in error['message'].keys()
-    assert len(error['message']['name']) == 1
-    assert error['message']['name'][0] == 'Missing data for required field.'
+    assert 'name' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['name']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['name'][0] == 'Missing data for ' \
+                                                                  'required field.'
 
-    assert 'version' in error['message'].keys()
-    assert len(error['message']['version']) == 1
-    assert error['message']['version'][0] == 'Missing data for required field.'
+    assert 'version' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['version']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['version'][0] == 'Missing data for ' \
+                                                                     'required field.'
 
 
 async def test_register_microservice_returns_validation_error_for_invalid_version(sanic_server):
@@ -94,16 +98,17 @@ async def test_register_microservice_returns_validation_error_for_invalid_versio
     assert Response.ERROR_FIELD_NAME in response.keys()
     error = response[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 1
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 1
 
-    assert 'version' in error['message'].keys()
-    assert len(error['message']['version']) == 1
-    assert error['message']['version'][0] == "Field value must match the " \
-                                             "`major.minor.patch` version semantics."
+    assert 'version' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['version']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['version'][0] == "Field value must match " \
+                                                                     "the `major.minor.patch` " \
+                                                                     "version semantics."
 
 
 async def test_register_microservice_creates_new_microservice_with_permissions(sanic_server):
@@ -161,18 +166,19 @@ async def test_register_microservice_returns_validation_error_for_invalid_permis
     assert Response.ERROR_FIELD_NAME in response.keys()
     error = response[Response.ERROR_FIELD_NAME]
 
-    assert "type" in error.keys()
-    assert error["type"] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 1
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 1
 
-    assert 'permissions' in error["message"].keys()
-    assert len(error["message"]['permissions']) == 1
-    assert len(error["message"]['permissions']['0']) == 1
-    assert 'codename' in error["message"]['permissions']['0'].keys()
-    assert len(error["message"]['permissions']['0']['codename']) == 1
-    assert error["message"]['permissions']['0']['codename'][0] == 'Not a valid string.'
+    details = error[Response.ERROR_DETAILS_FIELD_NAME]
+    assert 'permissions' in details.keys()
+    assert len(details['permissions']) == 1
+    assert len(details['permissions']['0']) == 1
+    assert 'codename' in details['permissions']['0'].keys()
+    assert len(details['permissions']['0']['codename']) == 1
+    assert details['permissions']['0']['codename'][0] == 'Not a valid string.'
 
 
 async def test_register_microservice_returns_validation_error_for_invalid_codename_format(sanic_server):  # NOQA
@@ -196,20 +202,20 @@ async def test_register_microservice_returns_validation_error_for_invalid_codena
     assert Response.ERROR_FIELD_NAME in response.keys()
     error = response[Response.ERROR_FIELD_NAME]
 
-    assert "type" in error.keys()
-    assert error["type"] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 1
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 1
 
-    assert 'permissions' in error["message"].keys()
-    assert len(error["message"]['permissions']) == 1
-    assert len(error["message"]['permissions']['0']) == 1
-    assert 'codename' in error["message"]['permissions']['0'].keys()
-    assert len(error["message"]['permissions']['0']['codename']) == 1
-    assert error["message"]['permissions']['0']['codename'][0] == "Field value can contain " \
-                                                                  "only 'a'-'z', '.', '-' " \
-                                                                  "characters."
+    details = error[Response.ERROR_DETAILS_FIELD_NAME]
+    assert 'permissions' in details.keys()
+    assert len(details['permissions']) == 1
+    assert len(details['permissions']['0']) == 1
+    assert 'codename' in details['permissions']['0'].keys()
+    assert len(details['permissions']['0']['codename']) == 1
+    assert details['permissions']['0']['codename'][0] == "Field value can contain " \
+                                                         "only 'a'-'z', '.', '-' characters."
 
 
 async def test_register_microservice_creates_new_microservice_without_permissions(sanic_server):

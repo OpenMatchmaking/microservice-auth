@@ -51,11 +51,11 @@ async def test_refresh_token_returns_error_for_a_missing_authorization_header(sa
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == AUTHORIZATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == AUTHORIZATION_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == "Authorization header isn't set in request."
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == "Authorization header isn't set in request."
 
 
 async def test_refresh_token_return_error_for_a_missing_header_prefix(sanic_server):
@@ -89,11 +89,12 @@ async def test_refresh_token_return_error_for_a_missing_header_prefix(sanic_serv
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == HEADER_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == HEADER_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == 'Before the token necessary to specify the `JWT` prefix.'
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == 'Before the token necessary ' \
+                                                       'to specify the `JWT` prefix.'
 
     await User.collection.delete_one({'id': user.id})
 
@@ -130,11 +131,12 @@ async def test_refresh_token_return_error_for_an_invalid_header_prefix(sanic_ser
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == HEADER_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == HEADER_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == 'Before the token necessary to specify the `JWT` prefix.'
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == 'Before the token necessary ' \
+                                                       'to specify the `JWT` prefix.'
 
     await User.collection.delete_one({'id': user.id})
 
@@ -174,11 +176,11 @@ async def test_refresh_token_return_error_for_an_invalid_access_token(sanic_serv
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == TOKEN_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == TOKEN_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == 'Signature verification failed.'
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == 'Signature verification failed.'
 
     await User.collection.delete_one({'id': user.id})
 
@@ -215,15 +217,16 @@ async def test_refresh_token_return_error_for_a_missing_refresh_token(sanic_serv
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == TOKEN_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == TOKEN_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message']) == 1
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]) == 1
 
-    assert 'refresh_token' in error['message'].keys()
-    assert len(error['message']['refresh_token']) == 1
-    assert error['message']['refresh_token'][0] == 'Missing data for required field.'
+    assert 'refresh_token' in error[Response.ERROR_DETAILS_FIELD_NAME].keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['refresh_token']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['refresh_token'][0] == 'Missing data for ' \
+                                                                           'required field.'
 
     await User.collection.delete_one({'id': user.id})
 
@@ -262,11 +265,12 @@ async def test_refresh_token_return_error_for_an_refresh_token(sanic_server):
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == TOKEN_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == TOKEN_ERROR
 
-    assert 'message' in error.keys()
-    assert error['message'] == "User wasn't found or specified an invalid `refresh_token`."
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_DETAILS_FIELD_NAME] == "User wasn't found or specified " \
+                                                       "an invalid `refresh_token`."
 
     await User.collection.delete_one({'id': user.id})
 

@@ -43,15 +43,15 @@ async def test_users_post_returns_validation_error_for_non_unique_username(sanic
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 1
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 1
 
-    assert 'username' in error['message']
-    assert len(error['message']['username']) == 1
-    assert error['message']['username'][0] == 'Username must be unique.'
+    assert 'username' in error[Response.ERROR_DETAILS_FIELD_NAME]
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['username']) == 1
+    assert error[Response.ERROR_DETAILS_FIELD_NAME]['username'][0] == 'Username must be unique.'
 
     await User.collection.delete_many({})
 
@@ -71,16 +71,16 @@ async def test_users_post_returns_validation_error_for_not_matched_password(sani
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 1
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 1
 
-    assert 'confirm_password' in error['message']
-    assert len(error['message']['confirm_password']) == 1
-    assert error['message']['confirm_password'][0] == 'Confirm password must ' \
-                                                      'equal to a new password.'
+    details = error[Response.ERROR_DETAILS_FIELD_NAME]
+    assert 'confirm_password' in details.keys()
+    assert len(details['confirm_password']) == 1
+    assert details['confirm_password'][0] == 'Confirm password must equal to a new password.'
 
 
 async def test_users_post_returns_validation_error_for_missing_fields(sanic_server):
@@ -94,23 +94,24 @@ async def test_users_post_returns_validation_error_for_missing_fields(sanic_serv
     assert Response.EVENT_FIELD_NAME not in response_json.keys()
     error = response_json[Response.ERROR_FIELD_NAME]
 
-    assert 'type' in error.keys()
-    assert error['type'] == VALIDATION_ERROR
+    assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
+    assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
 
-    assert 'message' in error.keys()
-    assert len(error['message'].keys()) == 3
+    assert Response.ERROR_DETAILS_FIELD_NAME in error.keys()
+    assert len(error[Response.ERROR_DETAILS_FIELD_NAME].keys()) == 3
 
-    assert 'username' in error['message']
-    assert len(error['message']['username']) == 1
-    assert error['message']['username'][0] == 'Missing data for required field.'
+    details = error[Response.ERROR_DETAILS_FIELD_NAME]
+    assert 'username' in details.keys()
+    assert len(details['username']) == 1
+    assert details['username'][0] == 'Missing data for required field.'
 
-    assert 'password' in error['message']
-    assert len(error['message']['password']) == 1
-    assert error['message']['password'][0] == 'Missing data for required field.'
+    assert 'password' in details.keys()
+    assert len(details['password']) == 1
+    assert details['password'][0] == 'Missing data for required field.'
 
-    assert 'confirm_password' in error['message']
-    assert len(error['message']['confirm_password']) == 1
-    assert error['message']['confirm_password'][0] == 'Missing data for required field.'
+    assert 'confirm_password' in details.keys()
+    assert len(details['confirm_password']) == 1
+    assert details['confirm_password'][0] == 'Missing data for required field.'
 
 
 async def test_users_get_not_allowed(sanic_server):
