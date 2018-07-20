@@ -24,7 +24,7 @@ class RegisterGameClientView(APIView):
         self.schema = CreateUserSchema
 
     async def validate_username_for_uniqueness(self, username):
-        users = await self.user_document.find({"username": username}).count()
+        users = await self.user_document.collection.count_documents({"username": username})
         if users:
             raise ValidationError(
                 "Username must be unique.",
@@ -40,9 +40,9 @@ class RegisterGameClientView(APIView):
             response.data.pop(Response.EVENT_FIELD_NAME, None)
             return json(response.data, status=400)
 
-        data['groups'] = await self.group_document\
-            .find({"name": self.default_group_name})\
-            .collation({"locale": "en", "strength": 2})\
+        data['groups'] = await self.group_document.collection \
+            .find({"name": self.default_group_name}) \
+            .collation({"locale": "en", "strength": 2}) \
             .to_list(1)
         user = self.user_document(**data)
         await user.commit()

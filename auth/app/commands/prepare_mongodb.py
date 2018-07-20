@@ -16,22 +16,24 @@ class PrepareMongoDbCommand(Command):
     """
     app = app
 
-    def clean_collections(self):
+    async def create_indexes(self):
         print("Clearing collections...")
-        User.ensure_indexes()
+        await User.ensure_indexes()
         print("User document was initialized...")
 
-        Group.ensure_indexes()
+        await Group.ensure_indexes()
         print("Group document was initialized...")
 
-        Permission.ensure_indexes()
+        await Permission.ensure_indexes()
         print("Permission document was initialized...")
 
-        Microservice.ensure_indexes()
+        await Microservice.ensure_indexes()
         print("Microservice document was initialized...")
         print("Done!")
 
-    async def create_default_groups(self):
+    async def initialize_documents(self):
+        await self.create_indexes()
+
         print("Creating default empty groups...")
         for group_name, config in self.app.config['DEFAULT_GROUPS'].items():
             data = {'name': group_name}
@@ -42,8 +44,7 @@ class PrepareMongoDbCommand(Command):
         print('Creating has completed!')
 
     def prepare_db(self, loop):
-        self.clean_collections()
-        loop.run_until_complete(self.create_default_groups())
+        loop.run_until_complete(self.initialize_documents())
 
     def init_lazy_umongo(self):
         client = AsyncIOMotorClient(self.app.config['MONGODB_URI'])
