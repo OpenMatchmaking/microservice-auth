@@ -1,13 +1,13 @@
 sanic==0.7.0
 sanic-script==0.3
-sanic-mongodb-extension==0.1.1
+sanic-mongodb-extension==0.2.0
 sanic-redis-extension==0.1.0
 sanic-amqp-extension==0.1.0
 
 aioredis==1.1.0
 aioamqp==0.10.0
 umongo==0.15.0
-motor==1.2.1
+motor==2.0.0
 marshmallow==2.15.0
 sage-utils==0.5.0
 
