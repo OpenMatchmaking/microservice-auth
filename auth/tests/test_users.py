@@ -1,47 +1,70 @@
 import json
 
+from sage_utils.amqp.clients import RpcAmqpClient
 from sage_utils.constants import VALIDATION_ERROR
 from sage_utils.wrappers import Response
 
+from app.users.api.v1.workers.register_game_client import RegisterGameClientWorker
 from app.users.documents import User
+
+
+REQUEST_QUEUE = RegisterGameClientWorker.QUEUE_NAME
+REQUEST_EXCHANGE = RegisterGameClientWorker.REQUEST_EXCHANGE_NAME
+RESPONSE_EXCHANGE = RegisterGameClientWorker.RESPONSE_EXCHANGE_NAME
 
 
 async def test_users_post_successfully_creates_a_new_user(sanic_server):
     await User.collection.delete_many({})
 
-    url = sanic_server.app.url_for('users.game-client-register')
-    payload = json.dumps({
+    payload = {
         "username": "new_user",
         "password": "123456",
         "confirm_password": "123456"
-    })
-    response = await sanic_server.post(url, data=payload)
-    response_json = await response.json()
-    assert response.status == 201
-    assert len(response_json.keys()) == 2
-    assert "id" in response_json
-    assert "username" in response_json
+    }
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload=payload)
 
-    await User.collection.delete_one({'id': response_json['id']})
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    content = response[Response.CONTENT_FIELD_NAME]
+
+    assert len(content.keys()) == 2
+
+    assert "id" in content
+
+    assert "username" in content
+    assert content["username"] == payload["username"]
+
+    await User.collection.delete_many({})
 
 
 async def test_users_post_returns_validation_error_for_non_unique_username(sanic_server):
     await User.collection.delete_many({})
     await User(**{"username": "new_user", "password": "123456"}).commit()
 
-    url = sanic_server.app.url_for('users.game-client-register')
-    payload = json.dumps({
+    payload = {
         "username": "new_user",
         "password": "123456",
         "confirm_password": "123456"
-    })
-    response = await sanic_server.post(url, data=payload)
-    response_json = await response.json()
-    assert response.status == 400
+    }
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload=payload)
 
-    assert Response.ERROR_FIELD_NAME in response_json.keys()
-    assert Response.EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[Response.ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
     assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
@@ -57,19 +80,23 @@ async def test_users_post_returns_validation_error_for_non_unique_username(sanic
 
 
 async def test_users_post_returns_validation_error_for_not_matched_password(sanic_server):
-    url = sanic_server.app.url_for('users.game-client-register')
-    payload = json.dumps({
+    payload = {
         "username": "new_user",
         "password": "123456",
         "confirm_password": "ANOTHER_PASSWORD"
-    })
-    response = await sanic_server.post(url, data=payload)
-    response_json = await response.json()
-    assert response.status == 400
+    }
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload=payload)
 
-    assert Response.ERROR_FIELD_NAME in response_json.keys()
-    assert Response.EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[Response.ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
     assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
@@ -84,15 +111,18 @@ async def test_users_post_returns_validation_error_for_not_matched_password(sani
 
 
 async def test_users_post_returns_validation_error_for_missing_fields(sanic_server):
-    url = sanic_server.app.url_for('users.game-client-register')
-    payload = json.dumps({})
-    response = await sanic_server.post(url, data=payload)
-    response_json = await response.json()
-    assert response.status == 400
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload={})
 
-    assert Response.ERROR_FIELD_NAME in response_json.keys()
-    assert Response.EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[Response.ERROR_FIELD_NAME]
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
     assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
@@ -112,27 +142,3 @@ async def test_users_post_returns_validation_error_for_missing_fields(sanic_serv
     assert 'confirm_password' in details.keys()
     assert len(details['confirm_password']) == 1
     assert details['confirm_password'][0] == 'Missing data for required field.'
-
-
-async def test_users_get_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('users.game-client-register')
-    response = await sanic_server.get(url)
-    assert response.status == 405
-
-
-async def test_users_patch_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('users.game-client-register')
-    response = await sanic_server.patch(url)
-    assert response.status == 405
-
-
-async def test_users_put_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('users.game-client-register')
-    response = await sanic_server.put(url)
-    assert response.status == 405
-
-
-async def test_users_delete_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('users.game-client-register')
-    response = await sanic_server.delete(url)
-    assert response.status == 405
