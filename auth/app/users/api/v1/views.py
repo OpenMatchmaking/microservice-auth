@@ -1,52 +1,12 @@
 from bson.objectid import ObjectId
 from jwt import InvalidTokenError
 from sanic.response import json
-from sage_utils.constants import VALIDATION_ERROR, NOT_FOUND_ERROR, TOKEN_ERROR
+from sage_utils.constants import NOT_FOUND_ERROR, TOKEN_ERROR
 from sage_utils.wrappers import Response
-from marshmallow import ValidationError
 
 from app.generic.views import APIView
 from app.token.exceptions import MissingAuthorizationHeader, InvalidHeaderPrefix
 from app.token.json_web_token import extract_and_decode_token
-
-
-class RegisterGameClientView(APIView):
-    default_group_name = "Game client"
-
-    def __init__(self):
-        super(RegisterGameClientView, self).__init__()
-        from app.users.documents import User
-        from app.groups.documents import Group
-        self.user_document = User
-        self.group_document = Group
-
-        from app.users.api.v1.schemas import CreateUserSchema
-        self.schema = CreateUserSchema
-
-    async def validate_username_for_uniqueness(self, username):
-        users = await self.user_document.collection.count_documents({"username": username})
-        if users:
-            raise ValidationError(
-                "Username must be unique.",
-                field_names=["username", ]
-            )
-
-    async def post(self, request):
-        try:
-            data = self.deserialize(request.json)
-            await self.validate_username_for_uniqueness(data["username"])
-        except ValidationError as exc:
-            response = Response.from_error(VALIDATION_ERROR, exc.normalized_messages())
-            response.data.pop(Response.EVENT_FIELD_NAME, None)
-            return json(response.data, status=400)
-
-        data['groups'] = await self.group_document.collection \
-            .find({"name": self.default_group_name}) \
-            .collation({"locale": "en", "strength": 2}) \
-            .to_list(1)
-        user = self.user_document(**data)
-        await user.commit()
-        return json(self.serialize(user), status=201)
 
 
 class UserProfileView(APIView):

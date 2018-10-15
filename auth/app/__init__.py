@@ -6,6 +6,7 @@ from sanic_amqp_ext import AmqpExtension
 
 from app.rabbitmq.workers import RegisterMicroserviceWorker
 from app.token.api.blueprints import token_bp
+from app.users.api.v1.workers.register_game_client import RegisterGameClientWorker
 from app.users.api.blueprints import users_bp_v1
 
 
@@ -21,6 +22,7 @@ RedisExtension(app)
 
 # RabbitMQ workers
 app.amqp.register_worker(RegisterMicroserviceWorker(app))
+app.amqp.register_worker(RegisterGameClientWorker(app))
 
 
 # Public API
