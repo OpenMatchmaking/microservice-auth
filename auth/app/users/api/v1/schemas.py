@@ -1,4 +1,4 @@
-from marshmallow import validate, validates_schema, ValidationError
+from marshmallow import Schema, validate, validates_schema, ValidationError
 from marshmallow.fields import String
 
 from app.users.documents import User
@@ -70,4 +70,18 @@ class UserProfileSchema(BaseUserSchema):
         fields = (
             'id',
             'username',
+        )
+
+
+class UserTokenSchema(Schema):
+    access_token = String(
+        required=True,
+        allow_none=False,
+        description='An JSON Web Token for getting an access to the resource.',
+        validate=validate.Length(min=1, error='Field cannot be blank.')
+    )
+
+    class Meta:
+        fields = (
+            'access_token',
         )

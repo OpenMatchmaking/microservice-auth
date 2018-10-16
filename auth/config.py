@@ -61,8 +61,6 @@ AMQP_USING_SSL = to_bool(os.environ.get("AMQP_USING_SSL", False))
 JWT_ALGORITHM = 'HS256'
 JWT_LIFETIME = 60 * 30
 JWT_SECRET_KEY = os.environ.get('APP_JWT_SECRET_KEY', 'some-secret-key')
-JWT_AUTHORIZATION_HEADER_NAME = 'authorization'
-JWT_AUTHORIZATION_HEADER_PREFIX = 'JWT'
 JWT_ACCESS_TOKEN_FIELD_NAME = 'access_token'
 JWT_REFRESH_TOKEN_FIELD_NAME = 'refresh_token'
 
