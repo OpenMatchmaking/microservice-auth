@@ -6,7 +6,7 @@ from sage_utils.constants import VALIDATION_ERROR, NOT_FOUND_ERROR, TOKEN_ERROR
 from sage_utils.wrappers import Response
 from sanic.response import json
 
-from app.token.exceptions import MissingAuthorizationHeader, InvalidHeaderPrefix
+from app.token.exceptions import MissingAccessToken
 from app.token.json_web_token import build_payload, generate_token_pair, extract_token, \
     decode_token, extract_and_decode_token, get_redis_key_by_user, generate_access_token
 from app.token.redis import get_refresh_token_from_redis
@@ -41,7 +41,7 @@ async def generate_tokens(request):
 async def verify_token(request):
     try:
         raw_access_token = extract_token(request)
-    except (MissingAuthorizationHeader, InvalidHeaderPrefix) as exc:
+    except (MissingAccessToken, InvalidHeaderPrefix) as exc:
         error = exc.details
         error.pop(Response.EVENT_FIELD_NAME, None)
         response = OrderedDict({"is_valid": False})
