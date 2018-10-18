@@ -23,7 +23,7 @@ class GenerateTokenWorker(AmqpWorker):
         self.user_document = User
         self.schema = LoginSchema
 
-    async def validate_data(self, raw_data):
+    def validate_data(self, raw_data):
         try:
             data = json.loads(raw_data.strip())
         except json.decoder.JSONDecodeError:
@@ -38,7 +38,7 @@ class GenerateTokenWorker(AmqpWorker):
 
     async def generate_token(self, raw_data):
         try:
-            data = await self.validate_data(raw_data)
+            data = self.validate_data(raw_data)
         except ValidationError as exc:
             return Response.from_error(VALIDATION_ERROR, exc.normalized_messages())
 
