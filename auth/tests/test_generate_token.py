@@ -133,4 +133,3 @@ async def test_generate_token_returns_validation_error_for_empty_body(sanic_serv
     assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['password']) == 1
     assert error[Response.ERROR_DETAILS_FIELD_NAME]['password'][0] == 'Missing data for ' \
                                                                       'required field.'
-
