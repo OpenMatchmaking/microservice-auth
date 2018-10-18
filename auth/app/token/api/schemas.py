@@ -26,13 +26,29 @@ class LoginSchema(Schema):
         )
 
 
+class VerifyTokenSchema(Schema):
+
+    access_token = String(
+        load_only=True,
+        required=True,
+        allow_none=False,
+        description='Access token.',
+        validate=validate.Length(min=1, error='Field cannot be blank.')
+    )
+
+    class Meta:
+        fields = (
+            'access_token',
+        )
+
+
 class RefreshTokenSchema(Schema):
 
     refresh_token = String(
         load_only=True,
         required=True,
         allow_none=False,
-        description='Refresh token',
+        description='Refresh token.',
         validate=validate.Length(min=1, error='Field cannot be blank.')
     )
 

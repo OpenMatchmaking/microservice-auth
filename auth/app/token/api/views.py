@@ -1,55 +1,13 @@
-from collections import OrderedDict
-
 from bson.objectid import ObjectId
 from jwt import InvalidIssuedAtError, ExpiredSignatureError, InvalidTokenError
 from sage_utils.constants import VALIDATION_ERROR, NOT_FOUND_ERROR, TOKEN_ERROR
 from sage_utils.wrappers import Response
 from sanic.response import json
 
-from app.token.exceptions import MissingAccessToken
-from app.token.json_web_token import build_payload, extract_token, decode_token, \
+from app.token.json_web_token import build_payload, extract_token, \
     extract_and_decode_token, get_redis_key_by_user, generate_access_token
 from app.token.redis import get_refresh_token_from_redis
 from app.token.api.schemas import RefreshTokenSchema
-
-
-async def verify_token(request):
-    try:
-        raw_access_token = extract_token(request)
-    except (MissingAccessToken, InvalidHeaderPrefix) as exc:
-        error = exc.details
-        error.pop(Response.EVENT_FIELD_NAME, None)
-        response = OrderedDict({"is_valid": False})
-        response.update(error)
-        return json(response, status=exc.status_code)
-
-    secret = request.app.config["JWT_SECRET_KEY"]
-    algorithm = request.app.config["JWT_ALGORITHM"]
-
-    error = None
-    is_valid = True
-    status_code = 200
-    try:
-        decode_token(raw_access_token, secret, algorithm)
-    except (InvalidIssuedAtError, ExpiredSignatureError) as exc:
-        is_valid = False
-        status_code = 400
-        error = Response.from_error(TOKEN_ERROR, str(exc))
-    except InvalidTokenError as exc:
-        is_valid = False
-        status_code = 400
-        error = Response.from_error(TOKEN_ERROR, str(exc))
-
-    response = OrderedDict({
-        Response.CONTENT_FIELD_NAME: "OK",
-        "is_valid": is_valid
-    })
-    if error:
-        error.data.pop(Response.EVENT_FIELD_NAME)
-        response.pop(Response.CONTENT_FIELD_NAME, None)
-        response.update(error.data)
-
-    return json(response, status=status_code)
 
 
 async def refresh_token_pairs(request):
