@@ -19,7 +19,7 @@ def build_payload(app, extra_data={}):
 
 
 def generate_access_token(payload, secret, algorithm):
-    return encode(payload, secret, algorithm=algorithm)
+    return encode(payload, secret, algorithm=algorithm).decode('utf-8')
 
 
 def generate_refresh_token(length=32, entropy=48):
