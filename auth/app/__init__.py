@@ -5,8 +5,8 @@ from sanic_redis_ext import RedisExtension
 from sanic_amqp_ext import AmqpExtension
 
 from app.rabbitmq.workers import RegisterMicroserviceWorker
-from app.users.api.v1.workers.register_game_client import RegisterGameClientWorker
-from app.users.api.v1.workers.user_profile import UserProfileWorker
+from app.users.api.workers.register_game_client import RegisterGameClientWorker
+from app.users.api.workers.user_profile import UserProfileWorker
 
 
 app = Sanic('microservice-auth')

@@ -19,7 +19,7 @@ class RegisterGameClientWorker(AmqpWorker):
         super(RegisterGameClientWorker, self).__init__(app, *args, **kwargs)
         from app.groups.documents import Group
         from app.users.documents import User
-        from app.users.api.v1.schemas import CreateUserSchema
+        from app.users.api.schemas import CreateUserSchema
         self.user_document = User
         self.group_document = Group
         self.schema = CreateUserSchema

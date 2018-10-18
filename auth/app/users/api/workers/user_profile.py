@@ -24,7 +24,7 @@ class UserProfileWorker(AmqpWorker):
         from app.users.documents import User
         from app.groups.documents import Group
         from app.permissions.documents import Permission
-        from app.users.api.v1.schemas import UserProfileSchema, UserTokenSchema
+        from app.users.api.schemas import UserProfileSchema, UserTokenSchema
         self.user_document = User
         self.group_document = Group
         self.permission_document = Permission

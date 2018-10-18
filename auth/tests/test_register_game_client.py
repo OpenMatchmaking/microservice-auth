@@ -1,10 +1,8 @@
-import json
-
 from sage_utils.amqp.clients import RpcAmqpClient
 from sage_utils.constants import VALIDATION_ERROR
 from sage_utils.wrappers import Response
 
-from app.users.api.v1.workers.register_game_client import RegisterGameClientWorker
+from app.users.api.workers.register_game_client import RegisterGameClientWorker
 from app.users.documents import User
 
 
