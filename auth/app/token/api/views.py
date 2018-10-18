@@ -7,35 +7,10 @@ from sage_utils.wrappers import Response
 from sanic.response import json
 
 from app.token.exceptions import MissingAccessToken
-from app.token.json_web_token import build_payload, generate_token_pair, extract_token, \
-    decode_token, extract_and_decode_token, get_redis_key_by_user, generate_access_token
+from app.token.json_web_token import build_payload, extract_token, decode_token, \
+    extract_and_decode_token, get_redis_key_by_user, generate_access_token
 from app.token.redis import get_refresh_token_from_redis
-from app.token.api.schemas import LoginSchema, RefreshTokenSchema
-
-
-async def generate_tokens(request):
-    credentials = LoginSchema().load(request.json or {})
-    if credentials.errors:
-        response = Response.from_error(VALIDATION_ERROR, credentials.errors)
-        response.data.pop(Response.EVENT_FIELD_NAME, None)
-        return json(response.data, 400)
-
-    username = credentials.data["username"]
-    password = credentials.data["password"]
-
-    user_document = request.app.config["LAZY_UMONGO"].User
-    user = await user_document.find_one({"username": username})
-    if not user or (user and not user.verify_password(password)):
-        response = Response.from_error(
-            NOT_FOUND_ERROR,
-            "User wasn't found or specified an invalid password."
-        )
-        response.data.pop(Response.EVENT_FIELD_NAME, None)
-        return json(response.data, 400)
-
-    payload = build_payload(request.app, extra_data={"user_id": str(user.pk)})
-    response = await generate_token_pair(request, payload, user.username)
-    return json(response, 201)
+from app.token.api.schemas import RefreshTokenSchema
 
 
 async def verify_token(request):
