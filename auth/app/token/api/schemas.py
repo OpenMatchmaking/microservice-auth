@@ -44,6 +44,13 @@ class VerifyTokenSchema(Schema):
 
 class RefreshTokenSchema(Schema):
 
+    access_token = String(
+        load_only=True,
+        required=True,
+        allow_none=False,
+        description='Access token.',
+        validate=validate.Length(min=1, error='Field cannot be blank.')
+    )
     refresh_token = String(
         load_only=True,
         required=True,
@@ -54,5 +61,6 @@ class RefreshTokenSchema(Schema):
 
     class Meta:
         fields = (
+            'access_token',
             'refresh_token',
         )
