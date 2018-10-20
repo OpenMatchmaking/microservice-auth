@@ -1,6 +1,6 @@
-sanic==0.7.0
+sanic==0.8.3
 sanic-script==0.3
-sanic-mongodb-extension==0.2.0
+sanic-mongodb-extension==0.2.1
 sanic-redis-extension==0.1.0
 sanic-amqp-extension==0.1.1
 
@@ -8,19 +8,19 @@ aioredis==1.1.0
 aioamqp==0.11.0
 umongo==0.15.0
 motor==2.0.0
-marshmallow==2.15.0
+marshmallow==2.16.0
 sage-utils==0.5.5
 
 bcrypt==3.1.4
 passlib==1.7.1
 pyjwt==1.6.4
 
-cchardet==2.1.1
+cchardet==2.1.4
 aiodns==1.1.1
 
-pytest==3.6.3
-pytest-cov==2.5.1
-pytest-sanic==0.1.12
+pytest==3.8.2
+pytest-cov==2.6.0
+pytest-sanic==0.1.13
 freezegun==0.3.10
 
 flake8==3.5.0

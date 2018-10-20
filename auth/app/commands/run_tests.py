@@ -14,6 +14,7 @@ class RunTestsCommand(Command):
 
     option_list = (
         Option('--app-name', '-a', dest='application', default='app'),
+        Option('--tests', '-t', dest='tests', default=None),
     )
 
     def setup_environ_for_pytest_cov(self):
@@ -25,5 +26,9 @@ class RunTestsCommand(Command):
     def run(self, *args, **kwargs):
         app = kwargs.get('application')
         self.setup_environ_for_pytest_cov()
-        pytest.main(args=["-q", "-v", "--cov", app, "--cov-report",
-                          "term-missing", "--tb=native"])
+        pytest_options = ["-q", "-v", "--cov", app, "--cov-report", "term-missing", "--tb=native"]
+
+        if kwargs.get('tests') is not None:
+            pytest_options.insert(0, kwargs['tests'])
+
+        pytest.main(args=pytest_options)

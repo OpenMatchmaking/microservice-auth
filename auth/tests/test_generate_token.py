@@ -1,9 +1,14 @@
-import json
-
+from sage_utils.amqp.clients import RpcAmqpClient
 from sage_utils.constants import NOT_FOUND_ERROR, VALIDATION_ERROR
 from sage_utils.wrappers import Response
 
+from app.token.api.workers.generate_token import GenerateTokenWorker
 from app.users.documents import User
+
+
+REQUEST_QUEUE = GenerateTokenWorker.QUEUE_NAME
+REQUEST_EXCHANGE = GenerateTokenWorker.REQUEST_EXCHANGE_NAME
+RESPONSE_EXCHANGE = GenerateTokenWorker.RESPONSE_EXCHANGE_NAME
 
 
 async def test_generate_token_returns_a_new_token_pair(sanic_server):
@@ -11,39 +16,52 @@ async def test_generate_token_returns_a_new_token_pair(sanic_server):
     user = User(**{"username": "user", "password": "123456"})
     await user.commit()
 
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    payload = json.dumps({
+    payload = {
         "username": "user",
         "password": "123456"
-    })
-    response = await sanic_server.post(url, data=payload)
-    response_json = await response.json()
-    assert response.status == 201
+    }
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload=payload)
 
-    assert len(response_json.keys()) == 2
-    assert sanic_server.app.config['JWT_ACCESS_TOKEN_FIELD_NAME'] in response_json.keys()
-    assert sanic_server.app.config['JWT_REFRESH_TOKEN_FIELD_NAME'] in response_json.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    assert Response.CONTENT_FIELD_NAME in response.keys()
+    content = response[Response.CONTENT_FIELD_NAME]
 
-    await User.collection.delete_one({'id': user.id})
+    assert len(content.keys()) == 2
+    assert sanic_server.app.config['JWT_ACCESS_TOKEN_FIELD_NAME'] in content.keys()
+    assert sanic_server.app.config['JWT_REFRESH_TOKEN_FIELD_NAME'] in content.keys()
+
+    await User.collection.delete_many({})
 
 
 async def test_generate_token_returns_error_for_an_invalid_username(sanic_server):
     await User.collection.delete_many({})
     await User(**{"username": "user", "password": "123456"}).commit()
 
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    payload = json.dumps({
+    payload = {
         "username": "NON_EXISTING_USER",
         "password": "123456"
-    })
-    response = await sanic_server.post(url, data=payload)
-    response_json = await response.json()
-    assert response.status == 400
-    assert len(response_json.keys()) == 1
-    assert Response.ERROR_FIELD_NAME in response_json.keys()
-    assert Response.EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[Response.ERROR_FIELD_NAME]
+    }
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload=payload)
 
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
+
+    assert len(error.keys()) == 2
     assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
     assert error[Response.ERROR_TYPE_FIELD_NAME] == NOT_FOUND_ERROR
 
@@ -58,19 +76,24 @@ async def test_generate_token_returns_error_for_an_invalid_password(sanic_server
     await User.collection.delete_many({})
     await User(**{"username": "user", "password": "123456"}).commit()
 
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    payload = json.dumps({
+    payload = {
         "username": "user",
         "password": "WRONG_PASSWORD"
-    })
-    response = await sanic_server.post(url, data=payload)
-    response_json = await response.json()
-    assert response.status == 400
-    assert len(response_json.keys()) == 1
-    assert Response.ERROR_FIELD_NAME in response_json.keys()
-    assert Response.EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[Response.ERROR_FIELD_NAME]
+    }
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload=payload)
 
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
+
+    assert len(error.keys()) == 2
     assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
     assert error[Response.ERROR_TYPE_FIELD_NAME] == NOT_FOUND_ERROR
 
@@ -82,15 +105,18 @@ async def test_generate_token_returns_error_for_an_invalid_password(sanic_server
 
 
 async def test_generate_token_returns_validation_error_for_empty_body(sanic_server):
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    response = await sanic_server.post(url)
-    response_json = await response.json()
-    assert response.status == 400
-    assert len(response_json.keys()) == 1
-    assert Response.ERROR_FIELD_NAME in response_json.keys()
-    assert Response.EVENT_FIELD_NAME not in response_json.keys()
-    error = response_json[Response.ERROR_FIELD_NAME]
-    assert len(error.keys()) == 2
+    client = RpcAmqpClient(
+        sanic_server.app,
+        routing_key=REQUEST_QUEUE,
+        request_exchange=REQUEST_EXCHANGE,
+        response_queue='',
+        response_exchange=RESPONSE_EXCHANGE
+    )
+    response = await client.send(payload={})
+
+    assert Response.ERROR_FIELD_NAME in response.keys()
+    assert Response.EVENT_FIELD_NAME in response.keys()
+    error = response[Response.ERROR_FIELD_NAME]
 
     assert Response.ERROR_TYPE_FIELD_NAME in error.keys()
     assert error[Response.ERROR_TYPE_FIELD_NAME] == VALIDATION_ERROR
@@ -107,27 +133,3 @@ async def test_generate_token_returns_validation_error_for_empty_body(sanic_serv
     assert len(error[Response.ERROR_DETAILS_FIELD_NAME]['password']) == 1
     assert error[Response.ERROR_DETAILS_FIELD_NAME]['password'][0] == 'Missing data for ' \
                                                                       'required field.'
-
-
-async def test_generate_token_get_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    response = await sanic_server.get(url)
-    assert response.status == 405
-
-
-async def test_generate_token_patch_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    response = await sanic_server.patch(url)
-    assert response.status == 405
-
-
-async def test_generate_token_put_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    response = await sanic_server.put(url)
-    assert response.status == 405
-
-
-async def test_generate_token_delete_not_allowed(sanic_server):
-    url = sanic_server.app.url_for('json-web-token-api.create-token')
-    response = await sanic_server.delete(url)
-    assert response.status == 405

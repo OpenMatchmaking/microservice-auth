@@ -1,9 +1,9 @@
 REFRESH_KEY_TEMPLATE = "{prefix}_{username}"
 
 
-def get_redis_key_by_user(request, username):
+def get_redis_key_by_user(app, username):
     return REFRESH_KEY_TEMPLATE.format(
-        prefix=request.app.config["JWT_REFRESH_TOKEN_FIELD_NAME"],
+        prefix=app.config["JWT_REFRESH_TOKEN_FIELD_NAME"],
         username=username
     )
 

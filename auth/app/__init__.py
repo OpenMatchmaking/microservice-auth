@@ -5,8 +5,11 @@ from sanic_redis_ext import RedisExtension
 from sanic_amqp_ext import AmqpExtension
 
 from app.rabbitmq.workers import RegisterMicroserviceWorker
-from app.token.api.blueprints import token_bp
-from app.users.api.blueprints import users_bp_v1
+from app.token.api.workers.generate_token import GenerateTokenWorker
+from app.token.api.workers.refresh_token import RefreshTokenWorker
+from app.token.api.workers.verify_token import VerifyTokenWorker
+from app.users.api.workers.register_game_client import RegisterGameClientWorker
+from app.users.api.workers.user_profile import UserProfileWorker
 
 
 app = Sanic('microservice-auth')
@@ -21,6 +24,11 @@ RedisExtension(app)
 
 # RabbitMQ workers
 app.amqp.register_worker(RegisterMicroserviceWorker(app))
+app.amqp.register_worker(GenerateTokenWorker(app))
+app.amqp.register_worker(RefreshTokenWorker(app))
+app.amqp.register_worker(VerifyTokenWorker(app))
+app.amqp.register_worker(RegisterGameClientWorker(app))
+app.amqp.register_worker(UserProfileWorker(app))
 
 
 # Public API
@@ -28,6 +36,4 @@ async def health_check(request):
     return text('OK')
 
 
-app.blueprint(token_bp)
-app.blueprint(users_bp_v1)
 app.add_route(health_check, '/auth/api/health-check', methods=['GET', ], name='health-check')
