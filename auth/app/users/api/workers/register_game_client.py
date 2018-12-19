@@ -103,5 +103,5 @@ class RegisterGameClientWorker(AmqpWorker):
             exchange_name=self.REQUEST_EXCHANGE_NAME,
             routing_key=self.QUEUE_NAME
         )
-        await channel.basic_qos(prefetch_count=1, prefetch_size=0, connection_global=False)
+        await channel.basic_qos(prefetch_count=50, prefetch_size=0, connection_global=False)
         await channel.basic_consume(self.consume_callback, queue_name=self.QUEUE_NAME)
