@@ -23,4 +23,4 @@ pytest-cov==2.6.0
 pytest-sanic==0.1.15
 freezegun==0.3.11
 
-flake8==3.5.0
+flake8==3.6.0
