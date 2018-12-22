@@ -18,7 +18,7 @@ pyjwt==1.7.1
 cchardet==2.1.4
 aiodns==1.1.1
 
-pytest==3.8.2
+pytest==4.0.2
 pytest-cov==2.6.0
 pytest-sanic==0.1.13
 freezegun==0.3.10
