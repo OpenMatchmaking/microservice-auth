@@ -21,6 +21,6 @@ aiodns==1.1.1
 pytest==4.0.2
 pytest-cov==2.6.0
 pytest-sanic==0.1.13
-freezegun==0.3.10
+freezegun==0.3.11
 
 flake8==3.6.0
