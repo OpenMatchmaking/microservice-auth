@@ -1,7 +1,7 @@
 sanic==0.8.3
 sanic-script==0.3
 sanic-mongodb-extension==0.2.1
-sanic-redis-extension==0.1.0
+sanic-redis-extension==0.1.1
 sanic-amqp-extension==0.1.2
 
 aioredis==1.2.0
