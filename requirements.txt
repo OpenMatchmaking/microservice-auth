@@ -6,7 +6,7 @@ sanic-amqp-extension==0.1.2
 
 aioredis==1.2.0
 aioamqp==0.12.0
-umongo==1.0.0
+umongo==1.2.0
 motor==2.0.0
 marshmallow==2.16.3
 sage-utils==0.5.6
