@@ -1,4 +1,4 @@
-sanic==0.8.3
+sanic==18.12.0
 sanic-script==0.3
 sanic-mongodb-extension==0.2.1
 sanic-redis-extension==0.1.1
